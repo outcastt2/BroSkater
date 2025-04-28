@@ -1,0 +1,2245 @@
+#/ QB Script version 2.1 by RoQ www.HackTHPS.de
+%include "grindscripts.qb_table.qbi"   #/ Table file
+
+:i function call $GetBoardGrindBone$ arguments 
+		$objId$ = $skater$
+	:i %GLOBAL%$objId$.$GetSparksPos$
+	:i switch %GLOBAL%$SparksPos$
+		:i case $front$
+			:i if %GLOBAL%$objId$.$BoardIsRotated$
+				:i %GLOBAL%$Bone$ = $Bone_Board_Tail$
+			:i else 
+				:i %GLOBAL%$Bone$ = $Bone_Board_Nose$
+			:i endif
+			:i endcase
+		case $rear$
+			:i if %GLOBAL%$objId$.$BoardIsRotated$
+				:i %GLOBAL%$Bone$ = $Bone_Board_Nose$
+			:i else 
+				:i %GLOBAL%$Bone$ = $Bone_Board_Tail$
+			:i endif
+			:i endcase
+		default 
+			:i %GLOBAL%$Bone$ = $Bone_Board_Root$
+			:i end_switch
+	
+	:i return
+	$Bone$ = %GLOBAL%$Bone$
+:i endfunction
+:i function call $SkateInOrBail$ arguments 
+		$moveleft$ = %i(1,00000001)$moveright$ = %i(4294967295,ffffffff)$movey$ = %i(4294967291,fffffffb)
+	:i $GetTags$
+	:i if $IsSkaterOnVehicle$
+		:i $OutAnim$ = %GLOBAL%$grind_out_anim$
+		:i $GrindBail$ = $vehicle_bail$
+	:i endif
+	:i $NoRailTricks$
+	:i $StopBalanceTrick$
+	:i $KillExtraTricks$
+	:i call $SetExtraTricks$ arguments 
+		$NoTricks$
+	:i if NOT $IsSkaterOnVehicle$
+		:i call $OnGroundExceptions$ arguments 
+			$NoEndRun$
+	:i endif
+	:i if NOT  (%GLOBAL%$GrindBail$ = $Airborne$) 
+		:i call $OnExceptionRun$ arguments 
+			$SkateInOrBail_Out$
+	:i endif
+	:i call $SetQueueTricks$ arguments 
+		$NoTricks$
+	:i $ClearManualTrick$
+	:i if call $GotParam$ arguments 
+			$Fallingright$
+		:i call $Goto$ arguments 
+			$SkateIn_Right$$Params$ = :s{ isNull :s}
+	:i endif
+	:i if call $GotParam$ arguments 
+			$FallingLeft$
+		:i call $Goto$ arguments 
+			$SkateIn_Left$$Params$ = :s{ isNull :s}
+	:i endif
+	:i if call $GotParam$ arguments 
+			$GrindRelease$
+		:i $TriggerGrindOff$
+		:i if call $Held$ arguments 
+				$Right$
+			:i call $Goto$ arguments 
+				$SkateIn_Right$$Params$ = :s{ isNull :s}
+		:i endif
+		:i if call $Held$ arguments 
+				$Left$
+			:i call $Goto$ arguments 
+				$SkateIn_Left$$Params$ = :s{ isNull :s}
+		:i endif
+		:i if call $SkateInAble$ arguments 
+				$Left$
+			:i call $Goto$ arguments 
+				$SkateIn_Left$$Params$ = :s{ isNull :s}
+		:i else 
+			:i call $Goto$ arguments 
+				$SkateIn_Right$$Params$ = :s{ isNull :s}
+		:i endif
+	:i endif
+	:i $printf$%s(39,"Missing a FallingLeft or FallingRight ?")
+	:i if call $GotParam$ arguments 
+			$GrindBail$
+		:i $Goto$%GLOBAL%$GrindBail$
+	:i else 
+		:i call $Goto$ arguments 
+			$FiftyFiftyFall$
+	:i endif
+:i endfunction
+:i function $OnGroundExceptions_NoOllieAfterEndofRun$
+	:i call $OnGroundExceptions$ arguments 
+		$NoEndRun$
+	:i if $GoalManager_GoalShouldExpire$
+		:i call $ClearException$ arguments 
+			$Ollied$
+		:i call $ClearException$ arguments 
+			$GroundGone$
+		:i call $ClearException$ arguments 
+			$WallPush$
+	:i endif
+:i endfunction
+:i function $SkateIn_Right$
+	:i if call $SkateInAble$ arguments 
+			$Right$
+		:i $skatein$ = %i(1,00000001)
+	:i else 
+		:i if call $NearGround$ arguments 
+				$Right$
+			:i $skatein$ = %i(1,00000001)
+			:i $Params$ = :s{$no_land_anim$ = %i(1,00000001):s}
+		:i endif
+	:i endif
+	:i if call $GotParam$ arguments 
+			$skatein$
+		:i $printf$%s(42,"SkateInable RIGHT >>>>>>>>>>>>>>>>>>>>>>>>")
+		:i $SetLandedFromVert$
+		:i call $SetState$ arguments 
+			$ground$
+		:i call $Move$ arguments 
+			$y$ = %i(4294967291,fffffffb)
+		:i call $Move$ arguments 
+			$x$ = %i(4294967295,ffffffff)
+		:i $OrientToNormal$
+		:i call $Rotate$ arguments 
+			$y$ = %i(4294967266,ffffffe2)$Duration$ = %f(0.200000)$seconds$
+		:i if NOT $IsSkaterOnVehicle$
+			:i $OnGroundExceptions_NoOllieAfterEndofRun$
+		:i endif
+		:i call $OnExceptionRun$ arguments 
+			$SkateInOrBail_Out$
+		:i call $SetQueueTricks$ arguments 
+			$NoTricks$
+		:i call $SetManualTricks$ arguments 
+			$NoTricks$
+		:i $SetExtraTricks_Reverts$
+		:i if $IsSkaterOnVehicle$
+			:i call $Goto$ arguments 
+				$vehicle_rail_exit$$Params$ = :s{$callback$ = $vehicle_land$:s}
+		:i else 
+			:i if call $GotParam$ arguments 
+					$OutAnim$
+				:i call $PlayAnim$ arguments 
+					$Anim$ = %GLOBAL%$OutAnim$$BlendPeriod$ = %f(0.300000)
+			:i else 
+				:i call $PlayAnim$ arguments 
+					$Anim$ = %GLOBAL%$initanim$$Backwards$$BlendPeriod$ = %f(0.300000)
+			:i endif
+			:i $WaitAnimWhilstChecking$
+			:i call $Goto$ arguments 
+				$SkateInLand$$Params$ = %GLOBAL%$Params$
+		:i endif
+	:i else 
+		:i call $Move$ arguments 
+			$y$ = %GLOBAL%$movey$
+		:i call $Move$ arguments 
+			$x$ = %GLOBAL%$moveright$
+		:i if $IsSkaterOnVehicle$
+			:i call $vehicle_rail_exit$ arguments 
+				$Params$ = :s{$callback$ = $vehicle_bail$:s}
+		:i else 
+			:i $SkateIn_Bail$ isNull $dir$ = $Right$
+		:i endif
+	:i endif
+:i endfunction
+:i function $SkateIn_Left$
+	:i if call $SkateInAble$ arguments 
+			$Left$
+		:i $skatein$ = %i(1,00000001)
+	:i else 
+		:i if call $NearGround$ arguments 
+				$Left$
+			:i $skatein$ = %i(1,00000001)
+			:i $Params$ = :s{$no_land_anim$ = %i(1,00000001):s}
+		:i endif
+	:i endif
+	:i if call $GotParam$ arguments 
+			$skatein$
+		:i $SetLandedFromVert$
+		:i $printf$%s(41,"SkateInable LEFT >>>>>>>>>>>>>>>>>>>>>>>>")
+		:i call $SetState$ arguments 
+			$ground$
+		:i call $Move$ arguments 
+			$x$ = %i(1,00000001)
+		:i call $Move$ arguments 
+			$y$ = %i(4294967291,fffffffb)
+		:i $OrientToNormal$
+		:i call $Rotate$ arguments 
+			$y$ = %i(30,0000001e)$Duration$ = %f(0.200000)$seconds$
+		:i call $SetState$ arguments 
+			$ground$
+		:i if NOT $IsSkaterOnVehicle$
+			:i $OnGroundExceptions_NoOllieAfterEndofRun$
+		:i endif
+		:i call $OnExceptionRun$ arguments 
+			$SkateInOrBail_Out$
+		:i call $SetQueueTricks$ arguments 
+			$NoTricks$
+		:i call $SetManualTricks$ arguments 
+			$NoTricks$
+		:i $SetExtraTricks_Reverts$
+		:i if $IsSkaterOnVehicle$
+			:i call $Goto$ arguments 
+				$vehicle_rail_exit$$Params$ = :s{$callback$ = $vehicle_land$:s}
+		:i else 
+			:i if call $GotParam$ arguments 
+					$OutAnim$
+				:i call $PlayAnim$ arguments 
+					$Anim$ = %GLOBAL%$OutAnim$$BlendPeriod$ = %f(0.300000)
+			:i else 
+				:i call $PlayAnim$ arguments 
+					$Anim$ = %GLOBAL%$initanim$$Backwards$$BlendPeriod$ = %f(0.300000)
+			:i endif
+			:i $WaitAnimWhilstChecking$
+			:i call $Goto$ arguments 
+				$SkateInLand$$Params$ = %GLOBAL%$Params$
+		:i endif
+	:i else 
+		:i $printf$%s(45,"Not skateinable left >>>>>>>>>>>>>>>>>>>>>>>>")
+		:i call $Move$ arguments 
+			$y$ = %GLOBAL%$movey$
+		:i call $Move$ arguments 
+			$x$ = %GLOBAL%$moveright$
+		:i if $IsSkaterOnVehicle$
+			:i call $vehicle_rail_exit$ arguments 
+				$Params$ = :s{$callback$ = $vehicle_bail$:s}
+		:i else 
+			:i $SkateIn_Bail$ isNull $dir$ = $Left$
+		:i endif
+	:i endif
+:i endfunction
+:i function $SkateIn_Bail$
+	:i if $Flipped$
+		:i if  (%GLOBAL%$dir$ = $Left$) 
+			:i $dir$ = $backward$
+		:i else 
+			:i $dir$ = $forward$
+		:i endif
+	:i else 
+		:i if  (%GLOBAL%$dir$ = $Left$) 
+			:i $dir$ = $forward$
+		:i else 
+			:i $dir$ = $backward$
+		:i endif
+	:i endif
+	:i if call $GotParam$ arguments 
+			$GrindBail$
+		:i $Goto$%GLOBAL%call $GrindBail$ arguments 
+			$Params$ = :s{$dir$ = %GLOBAL%$dir$:s}
+	:i else 
+		:i call $Goto$ arguments 
+			$FiftyFiftyFall$$Params$ = :s{$dir$ = %GLOBAL%$dir$:s}
+	:i endif
+:i endfunction
+:i function $SkateInLand$
+	:i call $OnExceptionRun$ arguments 
+		$SkateInLandOut$
+	:i $NollieOff$
+	:i $PressureOff$
+	:i call $Vibrate$ arguments 
+		$Actuator$ = %i(1,00000001)$Percent$ = %i(80,00000050)$Duration$ = %f(0.100000)
+	:i if NOT call $GotParam$ arguments 
+			$no_land_anim$
+		:i if $Crouched$
+			:i call $PlayAnim$ arguments 
+				$Anim$ = $CrouchedLand$$BlendPeriod$ = %f(0.100000)
+		:i else 
+			:i call $PlayAnim$ arguments 
+				$Anim$ = $Land$$BlendPeriod$ = %f(0.100000)
+		:i endif
+	:i endif
+	:i call $OnExceptionRun$ arguments 
+		$SkateInLandOut$
+	:i $OnGroundExceptions_NoOllieAfterEndofRun$
+	:i call $SetManualTricks$ arguments 
+		$NoTricks$
+	:i if NOT call $GotParam$ arguments 
+			$no_land_anim$
+		:i $WaitAnim$%i(10,0000000a)$Percent$
+	:i endif
+	:i $LandSkaterTricks$
+	:i $OnGroundExceptions$
+	:i $CheckforNetBrake$
+	:i $AllowRailtricks$
+	:i if NOT call $GotParam$ arguments 
+			$no_land_anim$
+		:i call $WaitAnimWhilstChecking$ arguments 
+			$AndManuals$
+	:i endif
+	:i call $Goto$ arguments 
+		$OnGroundAI$
+:i endfunction
+:i function $SkateInLandOut$
+	:i $AllowRailtricks$
+	:i $LandSkaterTricks$
+:i endfunction
+:i function $SkateInOrBail_Out$
+	:i $KillExtraTricks$
+	:i if NOT $InAir$
+		:i $printf$%s(76," =================================== LAND ==================================")
+		:i $LandSkaterTricks$
+	:i endif
+	:i $ResetLandedFromVert$
+	:i $printf$%s(79," =================================== NO VERT ==================================")
+:i endfunction
+:i $Extra_FS_Grinds$ = 
+:i :a{
+	:i :s{$Trigger$ = :s{$InOrder$;$a$ = $Triangle$;$b$ = $Triangle$;%i(300,0000012c):s}$Scr$ = call $Trick_5050_FS$ arguments 
+			$Params$ = :s{$Name$ = %sc(8,"FS 50-50")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Triangle$;$Square$;%i(300,0000012c):s}$Scr$ = call $Trick_NoseSlide_FS$ arguments 
+			$Params$ = :s{$Name$ = %sc(12,"FS Noseslide")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Triangle$;$Circle$;%i(300,0000012c):s}$Scr$ = call $Trick_Nosegrind_FS$ arguments 
+			$Params$ = :s{$Name$ = %sc(12,"FS Nosegrind")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$a$ = $Circle$;$b$ = $Circle$;%i(300,0000012c):s}$Scr$ = call $Trick_Crooked_FS$ arguments 
+			$Params$ = :s{$Name$ = %sc(10,"FS Crooked")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Circle$;$Square$;%i(300,0000012c):s}$Scr$ = call $Trick_Bluntslide_FS$ arguments 
+			$Params$ = :s{$Name$ = %sc(13,"FS Bluntslide")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Circle$;$Triangle$;%i(300,0000012c):s}$Scr$ = call $Trick_NoseBluntSlide_FS$ arguments 
+			$Params$ = :s{$Name$ = %sc(17,"FS Nosebluntslide")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$a$ = $Square$;$b$ = $Square$;%i(300,0000012c):s}$Scr$ = call $Trick_Smith_FS$ arguments 
+			$Params$ = :s{$Name$ = %sc(8,"FS Smith")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Square$;$Circle$;%i(300,0000012c):s}$Scr$ = call $Trick_5_0_FS$ arguments 
+			$Params$ = :s{$Name$ = %sc(6,"FS 5-0")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Square$;$Triangle$;%i(300,0000012c):s}$Scr$ = call $Trick_Tailslide_FS$ arguments 
+			$Params$ = :s{$Name$ = %sc(12,"FS Tailslide")$IsExtra$ = $yes$:s}:s}
+	:i :a}
+:i $Extra_BS_Grinds$ = 
+:i :a{
+	:i :s{$Trigger$ = :s{$InOrder$;$a$ = $Triangle$;$b$ = $Triangle$;%i(300,0000012c):s}$Scr$ = call $Trick_5050_BS$ arguments 
+			$Params$ = :s{$Name$ = %sc(8,"BS 50-50")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Triangle$;$Square$;%i(300,0000012c):s}$Scr$ = call $Trick_NoseSlide_BS$ arguments 
+			$Params$ = :s{$Name$ = %sc(12,"BS Noseslide")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Triangle$;$Circle$;%i(300,0000012c):s}$Scr$ = call $Trick_Nosegrind_BS$ arguments 
+			$Params$ = :s{$Name$ = %sc(12,"BS Nosegrind")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$a$ = $Circle$;$b$ = $Circle$;%i(300,0000012c):s}$Scr$ = call $Trick_Crooked_BS$ arguments 
+			$Params$ = :s{$Name$ = %sc(10,"BS Crooked")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Circle$;$Square$;%i(300,0000012c):s}$Scr$ = call $Trick_Bluntslide_BS$ arguments 
+			$Params$ = :s{$Name$ = %sc(13,"BS Bluntslide")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Circle$;$Triangle$;%i(300,0000012c):s}$Scr$ = call $Trick_NoseBluntSlide_BS$ arguments 
+			$Params$ = :s{$Name$ = %sc(17,"BS Nosebluntslide")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Square$;$Triangle$;%i(300,0000012c):s}$Scr$ = call $Trick_Tailslide_BS$ arguments 
+			$Params$ = :s{$Name$ = %sc(12,"BS Tailslide")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$a$ = $Square$;$b$ = $Square$;%i(300,0000012c):s}$Scr$ = call $Trick_Smith_BS$ arguments 
+			$Params$ = :s{$Name$ = %sc(8,"BS Smith")$IsExtra$ = $yes$:s}:s}
+	:i :s{$Trigger$ = :s{$InOrder$;$Square$;$Circle$;%i(300,0000012c):s}$Scr$ = call $Trick_5_0_BS$ arguments 
+			$Params$ = :s{$Name$ = %sc(6,"BS 5-0")$IsExtra$ = $yes$:s}:s}
+	:i :a}
+:i $GrindRelease$ = 
+:i :a{
+	:i :s{$Trigger$ = :s{$Press$;$R2$;%i(100,00000064):s}$Scr$ = call $SkateInOrBail$ arguments 
+			$NGC_Trigger$ = :s{$Press$;$R1$;%i(100,00000064):s}$Xbox_Trigger$ = :s{$AirTrickLogic$;$L2$;$R2$;%i(200,000000c8):s}$Params$ = :s{$GrindRelease$$GrindBail$ = $Airborne$$moveright$ = %i(4294967291,fffffffb)$movey$ = %i(5,00000005):s}:s}
+	:i :a}
+:i $SPECIALGRIND_SCORE$ = %i(1250,000004e2)
+:i $GRINDTAP_TIME$ = %i(1000,000003e8)
+:i $GRINDTAP_SCORE$ = %i(400,00000190)
+:i $GRINDTAP_TWEAK$ = %i(25,00000019)
+:i $GrindTaps_FS$ = :a{
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$UpRight$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_CrailSlide_FS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$DownRight$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_Darkslide_FS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$DownLeft$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_DoubleBluntSlide2$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$UpLeft$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_HangTenNoseGrind_FS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$Up$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_NosegrindPivot_FS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$Right$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_Salad_FS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$Left$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_Hurricane_FS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$Down$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_GrindOverturn_FS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :a}
+:i $GrindTaps_BS$ = :a{
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$UpRight$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_CrailSlide_BS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$DownRight$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_Darkslide_BS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$DownLeft$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_DoubleBluntSlide2$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$UpLeft$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_HangTenNoseGrind_BS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$Up$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_NosegrindPivot_BS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$Right$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_Salad_BS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$Down$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_GrindOverturn_BS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :s{$Trigger$ = :s{$TripleInOrderSloppy$;$Left$;$b$ = $Triangle$;$c$ = $Triangle$;$GRINDTAP_TIME$:s}$Scr$ = call $Trick_Hurricane_BS$ arguments 
+			$Params$ = :s{$IsExtra$ = %i(1,00000001):s}:s}
+	:i :a}
+:i function call $Grind$ arguments 
+		$GrindTweak$ = %i(7,00000007)$boardscuff$ = %i(0,00000000)$InitSpeed$ = %f(1.000000)$SparksPos$ = $rear$
+	:i $Obj_GetType$
+	:i if  (%GLOBAL%$ObjType$ = $OBJECT_TYPE_PED$) 
+		:i call $Goto$ arguments 
+			$Ped_Skater_BeginGrind$$Params$ =  isNull 
+		:i return
+		
+	:i endif
+	:i $KillExtraTricks$
+	:i if $IsSkaterOnVehicle$
+		:i call $Goto$ arguments 
+			$vehicle_grind$
+	:i endif
+	:i if $IsOnMotoskateboard$
+		:i if NOT call $GotParam$ arguments 
+				$motoskateboard_grind$
+			:i call $Goto$ arguments 
+				$Trick_Motoskateboard_Grind$
+		:i endif
+		:i $NoSpecial$ = $NoSpecial$
+	:i endif
+	:i if $BailIsOn$
+		:i call $SetState$ arguments 
+			$Air$
+		:i call $Goto$ arguments 
+			$DoingTrickBail$
+	:i endif
+	:i if $InNetGame$
+		:i if $BailIsOn$
+			:i call $SetState$ arguments 
+				$Air$
+			:i call $Goto$ arguments 
+				$DoingTrickBail$
+		:i endif
+	:i endif
+	:i $BailOff$
+	:i $CancelRotateDisplay$
+	:i $TurnOffSpecialItem$
+	:i call $LaunchStateChangeEvent$ arguments 
+		$State$ = $Skater_OnRail$
+	:i $ResetProjectileInput$
+	:i if NOT call $GotParam$ arguments 
+			$IsATap$
+		:i if NOT call $GotParam$ arguments 
+				$IsExtra$
+			:i if call $ChecksumEquals$ arguments 
+					$a$ = %GLOBAL%$Extratricks$$b$ = $Extra_BS_Grinds$
+				:i call $SetExtraTricks$ arguments 
+					$GrindTaps_BS$
+			:i else 
+				:i call $SetExtraTricks$ arguments 
+					$GrindTaps_FS$
+			:i endif
+		:i endif
+	:i endif
+	:i call $SetTags$ arguments 
+		$OutAnim$ = %GLOBAL%$OutAnim$$initanim$ = %GLOBAL%$initanim$$InitSpeed$ = %GLOBAL%$InitSpeed$$Anim$ = %GLOBAL%$Anim$
+	:i $SetTrickName$%s(0,"")
+	:i $SetTrickScore$%i(0,00000000)
+	:i call $Display$ arguments 
+		$Blockspin$
+	:i call $Obj_ClearFlag$ arguments 
+		$FLAG_SKATER_MANUALCHEESE$
+	:i call $Obj_ClearFlag$ arguments 
+		$FLAG_SKATER_REVERTCHEESE$
+	:i if call $GotParam$ arguments 
+			$SpecialItem_details$
+		:i call $TurnOnSpecialItem$ arguments 
+			$SpecialItem_details$ = %GLOBAL%$SpecialItem_details$
+	:i endif
+	:i if call $GotParam$ arguments 
+			$SwitchBoardOff$
+		:i $SwitchoffBoard$
+	:i endif
+	:i if call $GotParam$ arguments 
+			$IsSpecial$
+		:i call $BroadcastEvent$ arguments 
+			$type$ = $SkaterEnterSpecialTrick$
+		:i call $OnExitRun$ arguments 
+			$Exit_Special_Grind$
+	:i else 
+		:i call $OnExitRun$ arguments 
+			$Exit_Grind$
+	:i endif
+	:i if call $GotParam$ arguments 
+			$SpecialSounds$
+		:i $Obj_SpawnScript$%GLOBAL%$SpecialSounds$
+	:i endif
+	:i call $Vibrate$ arguments 
+		$Actuator$ = %i(1,00000001)$Percent$ = %i(50,00000032)$Duration$ = %f(0.250000)
+	:i call $Vibrate$ arguments 
+		$Actuator$ = %i(0,00000000)$Percent$ = %i(50,00000032)
+	:i $ClearExceptions$
+	:i if call $GotParam$ arguments 
+			$Nollie$
+		:i call $SetException$ arguments 
+			$Ex$ = $Ollied$$Scr$ = $NollieNoDisplay$
+		:i $NollieOn$
+	:i else 
+		:i if call $GotParam$ arguments 
+				$OutAnimOnOllie$
+			:i call $SetException$ arguments 
+				$Ex$ = $Ollied$$Scr$ = $Ollie$$Params$ = :s{ isNull :s}
+		:i else 
+			:i call $SetException$ arguments 
+				$Ex$ = $Ollied$$Scr$ = $Ollie$
+		:i endif
+		:i $NollieOff$
+	:i endif
+	:i $PressureOff$
+	:i %GLOBAL%$is_grind$ = %i(0,00000000)
+	:i if call $GotParam$ arguments 
+			$type$
+		:i if  (%GLOBAL%$type$ = $Grind$) 
+			:i %GLOBAL%$is_grind$ = %i(1,00000001)
+		:i endif
+	:i else 
+		:i $script_assert$%s(32,"No type specified on grind trick")
+	:i endif
+	:i $SetSparksPos$%GLOBAL%$SparksPos$
+	:i if  (%GLOBAL%$is_grind$ = %i(1,00000001)) 
+		:i $SparksOn$
+	:i else 
+		:i $GetBoardScuff$
+		:i %GLOBAL%$boardscuff$ =  (%GLOBAL%$boardscuff$ + %i(1,00000001)) 
+		:i call $SetTags$ arguments 
+			$boardscuff$ = %GLOBAL%$boardscuff$
+		:i call $DoBoardScuff$ arguments 
+			$boardscuff$ = %GLOBAL%$boardscuff$
+		:i $SparksOff$
+		:i call $SparksOn$ arguments 
+			$type$ = $slide$
+	:i endif
+	:i call $SetException$ arguments 
+		$Ex$ = $OffRail$$Scr$ = $OffRail$$Params$ = :s{$KissedRail$$initanim$ = %GLOBAL%$initanim$$InitSpeed$ = %GLOBAL%$InitSpeed$$OutAnim$ = %GLOBAL%$OutAnim$$BoardRotate$ = %GLOBAL%$BoardRotate$$OutAnimBackwards$ = %GLOBAL%$OutAnimBackwards$:s}
+	:i call $SetException$ arguments 
+		$Ex$ = $Landed$$Scr$ = $Grind_to_Land$
+	:i call $SetException$ arguments 
+		$Ex$ = $OffMeterTop$$Scr$ = $SkateInOrBail$$Params$ = :s{ isNull $FallingLeft$:s}
+	:i call $SetException$ arguments 
+		$Ex$ = $OffMeterBottom$$Scr$ = $SkateInOrBail$$Params$ = :s{ isNull $Fallingright$:s}
+	:i call $SetException$ arguments 
+		$Ex$ = $SkaterCollideBail$$Scr$ = $SkaterCollideBail$
+	:i call $SetEventHandler$ arguments 
+		$Ex$ = $MadeOtherSkaterBail$$Scr$ = $MadeOtherSkaterBail_Called$
+	:i call $OnExceptionRun$ arguments 
+		$Grind_Kissed$
+	:i $ClearTrickQueue$
+	:i $ClearManualTrick$
+	:i $ClearExtraGrindTrick$
+	:i call $SetQueueTricks$ arguments 
+		$NoTricks$
+	:i call $SetManualTricks$ arguments 
+		$NoTricks$
+	:i $SetRailSound$%GLOBAL%$type$
+	:i if call $GotParam$ arguments 
+			$IsSpecial$
+		:i $SetGrindTweak$%i(36,00000024)
+		:i %GLOBAL%$score$ = $SPECIALGRIND_SCORE$
+	:i else 
+		:i if call $GotParam$ arguments 
+				$IsATap$
+			:i call $SetGrindTweak$ arguments 
+				$GRINDTAP_TWEAK$
+			:i %GLOBAL%$score$ = $GRINDTAP_SCORE$
+		:i else 
+			:i $SetGrindTweak$%GLOBAL%$GrindTweak$
+		:i endif
+	:i endif
+	:i if call $GotParam$ arguments 
+			$IsExtra$
+		:i $LaunchExtraMessage$
+	:i endif
+	:i if call $GotParam$ arguments 
+			$Profile$
+		:i if call $ProfileEquals$ arguments 
+				$is_named$ = %GLOBAL%$Profile$
+			:i call $SwitchOnAtomic$ arguments 
+				$special_item$
+			:i call $SwitchOffAtomic$ arguments 
+				$special_item_2$
+		:i endif
+	:i endif
+	:i if call $GotParam$ arguments 
+			$FullScreenEffect$
+		:i %GLOBAL%$FullScreenEffect$
+		:i call $OnExitRun$ arguments 
+			$Exit_FullScreenEffect$
+	:i endif
+	:i if NOT call $AnimEquals$ arguments 
+			$JumpAirTo5050$
+		:i if call $GotParam$ arguments 
+				$NoBlend$
+			:i call $PlayAnim$ arguments 
+				$Anim$ = %GLOBAL%$initanim$$BlendPeriod$ = %f(0.000000)$Speed$ = %GLOBAL%$InitSpeed$
+		:i else 
+			:i call $PlayAnim$ arguments 
+				$Anim$ = %GLOBAL%$initanim$$BlendPeriod$ = %f(0.300000)$Speed$ = %GLOBAL%$InitSpeed$
+		:i endif
+	:i endif
+	:i if call $GotParam$ arguments 
+			$IsATap$
+		:i call $DoBalanceTrick$ arguments 
+			$ButtonA$ = $Right$$ButtonB$ = $Left$$type$ = %GLOBAL%$type$$DoFlipCheck$$ClearCheese$$IsATap$ = %i(1,00000001)
+	:i else 
+		:i if call $GotParam$ arguments 
+				$IsExtra$
+			:i call $DoBalanceTrick$ arguments 
+				$ButtonA$ = $Right$$ButtonB$ = $Left$$type$ = %GLOBAL%$type$$DoFlipCheck$$ClearCheese$$IsATap$ = %i(1,00000001)
+		:i else 
+			:i call $DoBalanceTrick$ arguments 
+				$ButtonA$ = $Right$$ButtonB$ = $Left$$type$ = %GLOBAL%$type$$DoFlipCheck$
+		:i endif
+	:i endif
+	:i call $GetSingleTag$ arguments 
+		$AcidDropCheese$
+	:i if call $GotParam$ arguments 
+			$AcidDropCheese$
+		:i if  (%GLOBAL%$AcidDropCheese$ > %i(0,00000000)) 
+			:i $printf$%s(38,"ACID DROP CHEESE ================== %i")$i$ = %GLOBAL%$AcidDropCheese$
+			:i call $AdjustBalance$ arguments 
+				$TimeAdd$ = %i(0,00000000)$SpeedMult$ = %i(2,00000002)$LeanMult$ = %f(3.200000)
+			:i call $RemoveTags$ arguments 
+				$tags$ = :a{$AcidDropCheese$:a}
+		:i endif
+	:i endif
+	:i $Wait$%i(15,0000000f)$frames$
+	:i call $SetExtraTricks$ arguments 
+		$GrindRelease$
+	:i $Wait$%i(1,00000001)$frame$
+	:i if call $GotParam$ arguments 
+			$Stream$
+		:i if NOT call $IsStreamPlaying$ arguments 
+				$SFXSpecialStream$
+			:i $PlayStream$%GLOBAL%call $Stream$ arguments 
+				$vol$ = %i(200,000000c8)$priority$ = $StreamPriorityHigh$$id$ = $SFXSpecialStream$
+		:i endif
+	:i endif
+	:i if call $GotParam$ arguments 
+			$IsSpecial$
+		:i call $LaunchSpecialMessage$ arguments 
+			$text$ = %s(13,"Special Grind")
+	:i endif
+	:i call $SetException$ arguments 
+		$Ex$ = $OffRail$$Scr$ = $OffRail$$Params$ = :s{$initanim$ = %GLOBAL%$initanim$$InitSpeed$ = %GLOBAL%$InitSpeed$$OutAnim$ = %GLOBAL%$OutAnim$$BoardRotate$ = %GLOBAL%$BoardRotate$$OutAnimBackwards$ = %GLOBAL%$OutAnimBackwards$:s}
+	:i call $OnExceptionRun$ arguments 
+		$Normal_Grind$
+	:i $SetTrickName$%GLOBAL%$Name$
+	:i $printf$%s(73,"++++++++++++++++++++++++++++++++++++++++++ BASE SCORE FOR THIS GRIND = %s")$s$ = %GLOBAL%$score$
+	:i $SetTrickScore$%GLOBAL%$score$
+	:i call $Display$ arguments 
+		$Blockspin$$NoSpecial$ = %GLOBAL%$NoSpecial$
+	:i if call $AnimEquals$ arguments 
+			$JumpAirTo5050$
+		:i $Obj_WaitAnimFinished$
+		:i call $PlayAnim$ arguments 
+			$Anim$ = %GLOBAL%$initanim$$BlendPeriod$ = %f(0.300000)$Speed$ = %GLOBAL%$InitSpeed$
+	:i endif
+	:i $Obj_WaitAnimFinished$
+	:i if call $GotParam$ arguments 
+			$FlipAfterInit$
+		:i $Flip$
+		:i $PlayBonkSound$
+		:i $BoardRotate$
+		:i $BlendperiodOut$%i(0,00000000)
+	:i endif
+	:i if call $GotParam$ arguments 
+			$Idle$
+		:i call $PlayAnim$ arguments 
+			$Anim$ = %GLOBAL%$Anim$$Cycle$$NoRestart$
+	:i else 
+		:i if call $GotParam$ arguments 
+				$Anim3$
+			:i if call $GotParam$ arguments 
+					$Anim2$
+				:i $PlayAnim$select(2f,3, 01 00 01 00 01 00) :OFFSET(0):OFFSET(1):OFFSET(2)
+					 :POS(0) $Anim$ = %GLOBAL%$Anim$
+				:BREAKTO(3)
+					 :POS(1) $Anim$ = %GLOBAL%$Anim2$
+				:BREAKTO(3)
+					 :POS(2) $Anim$ = %GLOBAL%call $Anim3$ arguments 
+						 :POS(3) $wobble$$wobbleparams$ = $grindwobble_params$
+				:i else 
+					:i $ScriptAssert$%s(100,"Script Assert: Added Anim3 to a grind without a valid anim2...check grindscripts.q Problem Anim = %a")$a$ = %GLOBAL%$Anim$
+				:i endif
+			:i else 
+				:i if call $GotParam$ arguments 
+						$Anim2$
+					:i $PlayAnim$select(2f,2, 01 00 01 00) :OFFSET(4):OFFSET(5)
+						 :POS(4) $Anim$ = %GLOBAL%$Anim$
+					:BREAKTO(6)
+						 :POS(5) $Anim$ = %GLOBAL%call $Anim2$ arguments 
+							 :POS(6) $wobble$$wobbleparams$ = $grindwobble_params$
+					:i else 
+						:i call $PlayAnim$ arguments 
+							$Anim$ = %GLOBAL%$Anim$$wobble$$wobbleparams$ = $grindwobble_params$
+					:i endif
+				:i endif
+			:i endif
+			:i if call $GotParam$ arguments 
+					$FlipBeforeOutAnim$
+				:i $BlendperiodOut$%f(0.000000)
+				:i $FlipAfter$
+			:i endif
+			:i if $AnimEquals$:a{call $FiftyFifty_Range$ arguments 
+						$NoseGrind_Range$$TailGrind_Range$:a}
+				:i $Wait$%f(0.250000)$seconds$
+			:i endif
+			:i if NOT $IsOnMotoskateboard$
+				:i if call $GotParam$ arguments 
+						$Extratricks$
+					:i $SetExtraTricks$%GLOBAL%call $Extratricks$ arguments 
+						$ignore$ = %GLOBAL%$Name$$GrindRelease$
+				:i else 
+					:i call $SetExtraTricks$ arguments 
+						$GrindRelease$
+				:i endif
+			:i endif
+			:i if call $GotParam$ arguments 
+					$ScreenShake$
+				:i call $Grind_ScreenShake$ arguments 
+					$ScreenShake$ = %GLOBAL%$ScreenShake$
+			:i endif
+			:i if call $GotParam$ arguments 
+					$specialtrick_particles$
+				:i $printf$%s(49,"Going to emit particles .........................")
+				:i call $Emit_SpecialTrickParticles$ arguments 
+					$specialitem_particles$ = %GLOBAL%$specialitem_particles$
+			:i endif
+			:i $WaitWhilstChecking_ForPressure$ isNull 
+		:i endfunction
+		:i function $Grind_to_Land$
+			:i $StopBalanceTrick$
+			:i call $Goto$ arguments 
+				$Land$
+		:i endfunction
+		:i function $Exit_FullScreenEffect$
+			:i %GLOBAL%$skaterlights_target$ =  ($tod_skaterlights$) 
+			:i call $SetFogColor$ arguments 
+				$r$ = $fog_red$$b$ = $fog_blue$$g$ = $fog_green$$a$ = $fog_alpha$
+			:i call $SetFogDistance$ arguments 
+				$distance$ = $fog_dist$
+			:i $KillManualVibration$
+			:i $Exit_Grind$
+		:i endfunction
+		:i function $Exit_FullScreenEffect_and_Special$
+			:i call $BroadcastEvent$ arguments 
+				$type$ = $SkaterExitSpecialTrick$
+			:i $Exit_FullScreenEffect$
+		:i endfunction
+		:i function $Exit_Grind$
+			:i $SwitchOnBoard$
+			:i $CleanUp_SpecialTrickParticles$
+		:i endfunction
+		:i function $Exit_Special_Grind$
+			:i $Exit_Special$
+			:i $Exit_Grind$
+		:i endfunction
+		:i function $Exit_Special$
+			:i call $BroadcastEvent$ arguments 
+				$type$ = $SkaterExitSpecialTrick$
+		:i endfunction
+		:i function call $GetBoardScuff$ arguments 
+				$ManualName$ = %sc(4,"none")
+			:i $GetTags$
+			:i return
+			$boardscuff$ = %GLOBAL%$boardscuff$
+		:i endfunction
+		:i function call $Grind_ScreenShake$ arguments 
+				$ScreenShake$ = %i(60,0000003c)
+			:i if $AnimEquals$:a{call $ElbowSmash_Idle$ arguments 
+						$FlipKickDad$:a}
+				:i while
+					
+					:i $Wait$%i(1,00000001)$frame$
+					:i if $FrameIs$%GLOBAL%$ScreenShake$
+						:i $printf$%s(23," THIS IS THE RIGHT SPOT")
+						:i $BloodSplat$
+						:i call $PlaySound$ arguments 
+							$BailSlap03$
+						:i $ShakeCamera$:s{
+							:i $Duration$ = %f(0.500000)
+							:i $vert_amp$ = %f(9.000000)
+							:i $horiz_amp$ = %f(3.000000)
+							:i $vert_vel$ = %f(10.270000)
+							:i $horiz_vel$ = %f(5.920000)
+						:i :s}
+					:i endif
+				:i loop_to 
+			:i endif
+		:i endfunction
+		:i $grindwobble_params$ = :s{
+			:i $WobbleAmpA$ = :s{%vec2(0.100000,0.100000)$STATS_RAILBALANCE$:s}
+			:i $WobbleAmpB$ = :s{%vec2(0.040000,0.040000)$STATS_RAILBALANCE$:s}
+			:i $WobbleK1$ = :s{%vec2(0.002200,0.002200)$STATS_RAILBALANCE$:s}
+			:i $WobbleK2$ = :s{%vec2(0.001700,0.001700)$STATS_RAILBALANCE$:s}
+			:i $SpazFactor$ = :s{%vec2(1.500000,1.500000)$STATS_RAILBALANCE$:s}
+		:i :s}
+		:i function $Grind_Kissed$
+			:i if call $GotParam$ arguments 
+					$MadeOtherSkaterBail$
+			:i else 
+				:i $KillExtraTricks$
+			:i endif
+			:i $SetTrickName$%s(0,"")
+			:i $SetTrickScore$%i(0,00000000)
+			:i call $Display$ arguments 
+				$Blockspin$
+			:i call $Obj_KillSpawnedScript$ arguments 
+				$Name$ = $CheckForShuffle$
+			:i call $Obj_SpawnScript$ arguments 
+				$CheckForShuffle$
+		:i endfunction
+		:i function $CheckForShuffle$
+			:i call $SetException$ arguments 
+				$Ex$ = $SkaterEnterRail$$Scr$ = $Awardshuffle$
+			:i $Wait$%i(15,0000000f)$frames$
+		:i endfunction
+		:i function $Awardshuffle$
+			:i $SetTrickName$%sc(0,"")
+			:i $SetTrickScore$%i(100,00000064)
+			:i call $Display$ arguments 
+				$Blockspin$$NoDegrade$
+			:i if NOT $InSplitscreenGame$
+				:i call $Create_Panel_Message$ arguments 
+					$text$ = %s(13,"Shuffle Bonus")$id$ = $perfect$$rgba$ = :a{%i(50,00000032)%i(120,00000078)%i(200,000000c8)%i(128,00000080):a}$pos$ = %vec2(110.000000,340.000000)$style$ = $perfect_style$
+				:i call $Create_Panel_Message$ arguments 
+					$text$ = %s(11,"+100 Points")$id$ = $perfect2$$rgba$ = :a{%i(50,00000032)%i(120,00000078)%i(200,000000c8)%i(100,00000064):a}$pos$ = %vec2(110.000000,360.000000)$style$ = $perfect_style$
+			:i else 
+				:i call $PerfectSloppy_2p$ arguments 
+					$text$ = %s(8,"Shuffle!")$rgb$ = :a{%i(50,00000032)%i(120,00000078)%i(50,00000032)%i(128,00000080):a}
+			:i endif
+		:i endfunction
+		:i function $Normal_Grind$
+			:i if call $GotParam$ arguments 
+					$MadeOtherSkaterBail$
+			:i else 
+				:i $KillExtraTricks$
+			:i endif
+			:i call $SwitchOffAtomic$ arguments 
+				$special_item$
+			:i call $SwitchOnAtomic$ arguments 
+				$special_item_2$
+		:i endfunction
+		:i function call $OffRail$ arguments 
+				$InitSpeed$ = %f(1.000000)
+			:i if call $GotParam$ arguments 
+					$KissedRail$
+				:i $SetTrickScore$%i(50,00000032)
+				:i $SetTrickName$%s(15,"Kissed the Rail")
+				:i call $Display$ arguments 
+					$Blockspin$$NoMult$
+			:i endif
+			:i $StopBalanceTrick$
+			:i $KillExtraTricks$
+			:i call $Vibrate$ arguments 
+				$Actuator$ = %i(0,00000000)$Percent$ = %i(0,00000000)
+			:i call $SetState$ arguments 
+				$Air$
+			:i call $SetException$ arguments 
+				$Ex$ = $Landed$$Scr$ = $Land$
+			:i call $SetException$ arguments 
+				$Ex$ = $WallRideLeft$$Scr$ = $WallRide$$Params$ = :s{$Left$:s}
+			:i call $SetException$ arguments 
+				$Ex$ = $WallRideRight$$Scr$ = $WallRide$$Params$ = :s{$Right$:s}
+			:i call $SetException$ arguments 
+				$Ex$ = $WallPlant$$Scr$ = $Air_WallPlant$
+			:i $DoNextTrick$
+			:i if call $GotParam$ arguments 
+					$EarlyOut$
+				:i call $PlayAnim$ arguments 
+					$Anim$ = %GLOBAL%$EarlyOut$$BlendPeriod$ = %f(0.100000)$Backwards$
+			:i else 
+				:i if call $GotParam$ arguments 
+						$OutAnim$
+					:i if call $GotParam$ arguments 
+							$OutAnimBackwards$
+						:i $printf$%s(25,"Playing OutAnim Backwards")
+						:i call $PlayAnim$ arguments 
+							$Anim$ = %GLOBAL%$OutAnim$$Backwards$$BlendPeriod$ = %f(0.100000)$Speed$ = %GLOBAL%$InitSpeed$
+					:i else 
+						:i call $PlayAnim$ arguments 
+							$Anim$ = %GLOBAL%$OutAnim$$BlendPeriod$ = %f(0.100000)$Speed$ = %GLOBAL%$InitSpeed$
+					:i endif
+				:i else 
+					:i call $PlayAnim$ arguments 
+						$Anim$ = %GLOBAL%$initanim$$BlendPeriod$ = %f(0.100000)$Backwards$$Speed$ = %GLOBAL%$InitSpeed$
+				:i endif
+			:i endif
+			:i if call $GotParam$ arguments 
+					$BoardRotate$
+				:i $printf$%s(41,"Setting blendperiod out..................")
+				:i $BlendperiodOut$%i(0,00000000)
+				:i $BoardRotateAfter$
+			:i endif
+			:i if call $GotParam$ arguments 
+					$FlipAfter$
+				:i $printf$%s(26,"flipping..................")
+				:i $FlipAfter$
+			:i endif
+			:i $Obj_WaitAnimFinished$
+			:i call $Goto$ arguments 
+				$Airborne$
+		:i endfunction
+		:i function call $Trick_5050_BS$ arguments 
+				$Name$ = %sc(8,"BS 50-50")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(100,00000064)$initanim$ = $Init_FiftyFifty$$Anim$ = $FiftyFifty2_range$$Anim2$ = $FiftyFifty_Range$$Anim3$ = $FiftyFifty3_range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparkPos$ = $rear$:s}
+		:i endfunction
+		:i function call $Trick_5050_FS$ arguments 
+				$Name$ = %sc(8,"FS 50-50")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(100,00000064)$initanim$ = $Init_FiftyFifty$$Anim$ = $FiftyFifty2_range$$Anim2$ = $FiftyFifty_Range$$Anim3$ = $FiftyFifty3_range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_5050_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_5050_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_5050_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_5050_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_Boardslide_FS$ arguments 
+				$Name$ = %sc(13,"FS Boardslide")
+			:i $Rotate$
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(200,000000c8)$GrindTweak$ = %i(14,0000000e)$initanim$ = $Init_FSBoardslide$$Anim$ = $FSBoardslide_range$$OutAnim$ = $FSBoardslide_Out$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $slide$ arguments 
+					$SparkPos$ = $front$:s}
+		:i endfunction
+		:i function call $Trick_Boardslide_BS$ arguments 
+				$Name$ = %sc(13,"BS Boardslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(200,000000c8)$GrindTweak$ = %i(14,0000000e)$initanim$ = $Init_BSBoardslide$$Anim$ = $BSBoardslide_range$$OutAnim$ = $BSBoardslide_Out$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $slide$ arguments 
+					$SparkPos$ = $rear$:s}
+		:i endfunction
+		:i function call $Trick_Lipslide_FS$ arguments 
+				$Name$ = %sc(11,"FS Lipslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(200,000000c8)$GrindTweak$ = %i(14,0000000e)$initanim$ = $Init_FSLipslide$$Anim$ = $BSBoardslide_range$$OutAnim$ = $BSBoardslide_Out$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $slide$ arguments 
+					$SparkPos$ = $front$:s}
+		:i endfunction
+		:i function call $Trick_Lipslide_BS$ arguments 
+				$Name$ = %sc(11,"BS Lipslide")
+			:i $Rotate$
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(200,000000c8)$GrindTweak$ = %i(14,0000000e)$initanim$ = $Init_BSLipslide$$Anim$ = $FSBoardslide_range$$OutAnim$ = $FSBoardslide_Out$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $slide$ arguments 
+					$SparkPos$ = $rear$:s}
+		:i endfunction
+		:i function $Trick_Tailslide_FS$
+			:i if $BadLedge$
+				:i call $Goto$ arguments 
+					$Trick_NoseSlide_BS_ok$$Params$ = :s{$IsExtra$ = %GLOBAL%$IsExtra$$NoBlend$ = %GLOBAL%$NoBlend$:s}
+			:i else 
+				:i call $Goto$ arguments 
+					$Trick_Tailslide_FS_ok$$Params$ = :s{$IsExtra$ = %GLOBAL%$IsExtra$$NoBlend$ = %GLOBAL%$NoBlend$:s}
+			:i endif
+		:i endfunction
+		:i function call $Trick_Tailslide_FS_ok$ arguments 
+				$Name$ = %sc(12,"FS Tailslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(150,00000096)$GrindTweak$ = %i(11,0000000b)$initanim$ = $Init_FSTailslide$$InitSpeed$ = %f(1.500000)$Anim$ = $FSTailslide_range$$OutAnim$ = $FSTailslide_Out$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_Tailslide_BS$
+			:i if $BadLedge$
+				:i call $Goto$ arguments 
+					$Trick_NoseSlide_FS_ok$$Params$ = :s{$IsExtra$ = %GLOBAL%$IsExtra$$NoBlend$ = %GLOBAL%$NoBlend$:s}
+			:i else 
+				:i call $Goto$ arguments 
+					$Trick_Tailslide_BS_ok$$Params$ = :s{$IsExtra$ = %GLOBAL%$IsExtra$$NoBlend$ = %GLOBAL%$NoBlend$:s}
+			:i endif
+		:i endfunction
+		:i function call $Trick_Tailslide_BS_ok$ arguments 
+				$Name$ = %sc(12,"BS Tailslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(150,00000096)$GrindTweak$ = %i(11,0000000b)$initanim$ = $Init_Tailslide$$InitSpeed$ = %f(1.500000)$Anim$ = $Tailslide_range$$OutAnim$ = $BSTailslide_Out$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_Tailslide_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Tailslide_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Tailslide_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Tailslide_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_NoseSlide_FS$
+			:i if $BadLedge$
+				:i call $Goto$ arguments 
+					$Trick_Tailslide_BS_ok$$Params$ = :s{$IsExtra$ = %GLOBAL%$IsExtra$$NoBlend$ = %GLOBAL%$NoBlend$:s}
+			:i else 
+				:i call $Goto$ arguments 
+					$Trick_NoseSlide_FS_ok$$Params$ = :s{$IsExtra$ = %GLOBAL%$IsExtra$$NoBlend$ = %GLOBAL%$NoBlend$:s}
+			:i endif
+		:i endfunction
+		:i function call $Trick_NoseSlide_FS_ok$ arguments 
+				$Name$ = %sc(12,"FS Noseslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(150,00000096)$GrindTweak$ = %i(11,0000000b)$initanim$ = $Init_FSNoseslide$$InitSpeed$ = %f(1.500000)$Anim$ = $FSNoseslide_range$$type$ = $slide$$Nollie$ = $yes$$OutAnim$ = $FSNoseSlide_Out$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_NoseSlide_BS$
+			:i if $BadLedge$
+				:i call $Goto$ arguments 
+					$Trick_Tailslide_FS_ok$$Params$ = :s{$IsExtra$ = %GLOBAL%$IsExtra$$NoBlend$ = %GLOBAL%$NoBlend$:s}
+			:i else 
+				:i call $Goto$ arguments 
+					$Trick_NoseSlide_BS_ok$$Params$ = :s{$IsExtra$ = %GLOBAL%$IsExtra$$NoBlend$ = %GLOBAL%$NoBlend$:s}
+			:i endif
+		:i endfunction
+		:i function call $Trick_NoseSlide_BS_ok$ arguments 
+				$Name$ = %sc(12,"BS Noseslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(150,00000096)$GrindTweak$ = %i(11,0000000b)$initanim$ = $Init_Noseslide$$InitSpeed$ = %f(1.500000)$Anim$ = $Noseslide_range$$OutAnim$ = $BSNoseslide_Out$$type$ = $slide$$Nollie$ = $yes$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_Noseslide_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_NoseSlide_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Noseslide_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_NoseSlide_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_Nosegrind_FS$ arguments 
+				$Name$ = %sc(12,"FS Nosegrind")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(100,00000064)$initanim$ = $Init_Nosegrind$$InitSpeed$ = %f(1.500000)$Anim$ = $NoseGrind_Range$$type$ = $Grind$$Nollie$ = $yes$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparksPos$ = $front$:s}
+		:i endfunction
+		:i function call $Trick_Nosegrind_BS$ arguments 
+				$Name$ = %sc(12,"BS Nosegrind")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(100,00000064)$initanim$ = $Init_Nosegrind$$InitSpeed$ = %f(1.500000)$Anim$ = $NoseGrind_Range$$type$ = $Grind$$Nollie$ = $yes$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparksPos$ = $front$:s}
+		:i endfunction
+		:i function $Trick_NoseGrind_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_5_0_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_NoseGrind_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_5_0_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_5_0_FS$ arguments 
+				$Name$ = %sc(6,"FS 5-0")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(100,00000064)$initanim$ = $Init_Tailgrind$$InitSpeed$ = %f(1.500000)$Anim$ = $TailGrind_Range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function call $Trick_5_0_BS$ arguments 
+				$Name$ = %sc(6,"BS 5-0")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(100,00000064)$initanim$ = $Init_Tailgrind$$InitSpeed$ = %f(1.500000)$Anim$ = $TailGrind_Range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_5_0_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Nosegrind_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_5_0_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Nosegrind_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_Crooked_FS$ arguments 
+				$Name$ = %sc(10,"FS Crooked")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(125,0000007d)$GrindTweak$ = %i(9,00000009)$initanim$ = $Init_FSCrooked$$InitSpeed$ = %f(1.500000)$Anim$ = $FSCrooked_range$$Nollie$ = $yes$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $Grind$ arguments 
+					$SparksPos$ = $front$:s}
+		:i endfunction
+		:i function $Trick_Crooked_FS_rot$
+			:i $Rotate$
+			:i call $Goto$ arguments 
+				$Trick_Crooked_FS$
+		:i endfunction
+		:i function call $Trick_Crooked_BS$ arguments 
+				$Name$ = %sc(10,"BS Crooked")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(125,0000007d)$GrindTweak$ = %i(9,00000009)$initanim$ = $Init_BSCrooked$$InitSpeed$ = %f(1.500000)$Anim$ = $BSCrooked_range$$Nollie$ = $yes$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $Grind$ arguments 
+					$SparksPos$ = $front$:s}
+		:i endfunction
+		:i function $Trick_Crooked_FS_180$
+			:i if $Backwards$
+				:i $printf$%s(25,"I'm backwards............")
+			:i endif
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Crooked_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Crooked_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Crooked_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_NGCRook_FS_rot$
+			:i $Rotate$
+			:i $printf$%s(48,"fixed it bitches................................")
+			:i call $Goto$ arguments 
+				$Trick_NGCRook_FS$
+		:i endfunction
+		:i function call $Trick_NGCRook_FS$ arguments 
+				$Name$ = %sc(12,"FS Overcrook")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(125,0000007d)$GrindTweak$ = %i(9,00000009)$initanim$ = $Init_FSOvercrook$$InitSpeed$ = %f(1.500000)$Anim$ = $FSOvercrook_range$$type$ = $Grind$$Nollie$ = $yes$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparksPos$ = $front$:s}
+		:i endfunction
+		:i function call $Trick_NGCrook_BS$ arguments 
+				$Name$ = %sc(12,"BS Overcrook")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(125,0000007d)$GrindTweak$ = %i(9,00000009)$initanim$ = $Init_BSOvercrook$$InitSpeed$ = %f(1.500000)$Anim$ = $BSOvercrook_range$$type$ = $Grind$$Nollie$ = $yes$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparksPos$ = $front$:s}
+		:i endfunction
+		:i function $Trick_NGCRook_FS_180$
+			:i $FlipAndRotate$
+			:i call $Goto$ arguments 
+				$Trick_NGCrook_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_NGCrook_BS_180$
+			:i $FlipAndRotate$
+			:i call $Goto$ arguments 
+				$Trick_NGCRook_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_Smith_FS$ arguments 
+				$Name$ = %sc(8,"FS Smith")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(125,0000007d)$GrindTweak$ = %i(9,00000009)$initanim$ = $Init_FSSmith$$InitSpeed$ = %f(1.500000)$Anim$ = $FSSmith_range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparksPos$ = $front$:s}
+		:i endfunction
+		:i function $Trick_Smith_FS_rot$
+			:i $Rotate$
+			:i call $Goto$ arguments 
+				$Trick_Smith_FS$
+		:i endfunction
+		:i function call $Trick_Smith_BS$ arguments 
+				$Name$ = %sc(8,"BS Smith")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(125,0000007d)$GrindTweak$ = %i(9,00000009)$initanim$ = $Init_BSSmith$$InitSpeed$ = %f(1.500000)$Anim$ = $BSSmith_range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparksPos$ = $front$:s}
+		:i endfunction
+		:i function $Trick_Smith_FS_180$
+			:i $FlipAndRotate$
+			:i call $Goto$ arguments 
+				$Trick_Smith_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Smith_BS_180$
+			:i $FlipAndRotate$
+			:i call $Goto$ arguments 
+				$Trick_Smith_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_Feeble_FS$ arguments 
+				$Name$ = %sc(9,"FS Feeble")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(125,0000007d)$GrindTweak$ = %i(9,00000009)$initanim$ = $Init_FSFeeble$$InitSpeed$ = %f(1.500000)$Anim$ = $FSFeeble_range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparksPos$ = $front$:s}
+		:i endfunction
+		:i function $Trick_Feeble_FS_rot$
+			:i $Rotate$
+			:i call $Goto$ arguments 
+				$Trick_Feeble_FS$
+		:i endfunction
+		:i function call $Trick_Feeble_BS$ arguments 
+				$Name$ = %sc(9,"BS Feeble")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(125,0000007d)$GrindTweak$ = %i(9,00000009)$initanim$ = $Init_BSFeeble$$InitSpeed$ = %f(1.500000)$Anim$ = $BSFeeble_range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparksPos$ = $rear$:s}
+		:i endfunction
+		:i function $Trick_Feeble_FS_180$
+			:i $FlipAndRotate$
+			:i call $Goto$ arguments 
+				$Trick_Feeble_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Feeble_BS_180$
+			:i $FlipAndRotate$
+			:i call $Goto$ arguments 
+				$Trick_Feeble_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_Bluntslide_BS$ arguments 
+				$Name$ = %sc(13,"BS Bluntslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(250,000000fa)$GrindTweak$ = %i(18,00000012)$initanim$ = $Init_BSBluntSlide$$InitSpeed$ = %f(1.500000)$Anim$ = $BSBluntSlide_range$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparksPos$ = $rear$:s}
+		:i endfunction
+		:i function call $Trick_Bluntslide_FS$ arguments 
+				$Name$ = %sc(13,"FS Bluntslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(250,000000fa)$GrindTweak$ = %i(18,00000012)$initanim$ = $Init_FSBluntSlide$$InitSpeed$ = %f(1.500000)$Anim$ = $FSBluntSlide_range$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparksPos$ = $front$:s}
+		:i endfunction
+		:i function call $Trick_NoseBluntSlide_BS$ arguments 
+				$Name$ = %sc(17,"BS Nosebluntslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(250,000000fa)$GrindTweak$ = %i(18,00000012)$initanim$ = $Init_BSNoseblunt$$InitSpeed$ = %f(1.500000)$Anim$ = $BSNoseblunt_range$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$Nollie$ = $yes$
+				:i $SparksPos$ = $rear$:s}
+		:i endfunction
+		:i function call $Trick_NoseBluntSlide_FS$ arguments 
+				$Name$ = %sc(17,"FS Nosebluntslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(250,000000fa)$GrindTweak$ = %i(18,00000012)$initanim$ = $Init_FSNoseblunt$$InitSpeed$ = %f(1.500000)$Anim$ = $FSNoseblunt_range$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$Nollie$ = $yes$$IsExtra$ = %GLOBAL%$IsExtra$$Extratricks$ = $Extra_FS_Grinds$
+				:i $SparksPos$ = $front$:s}
+		:i endfunction
+		:i function $Trick_Bluntslide_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Bluntslide_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Bluntslide_FS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Bluntslide_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Nosebluntslide_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_NoseBluntSlide_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Nosebluntslide_FS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_NoseBluntSlide_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_DoubleBluntSlide2$
+			:i $Grind$:s{$Name$ = %sc(18,"Double Blunt Slide")$score$ = call $GRINDTAP_SCORE$ arguments 
+					$initanim$ = $DoubleBlunt_Init$$InitSpeed$ = %f(1.500000)$Anim$ = $DoubleBlunt_Idle$$Idle$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_DoubleBluntSlide2_180$
+			:i call $BackwardsGrind$ arguments 
+				$Grind$ = $Trick_DoubleBluntSlide2$
+		:i endfunction
+		:i function call $Trick_Salad_FS$ arguments 
+				$Name$ = %sc(8,"FS Salad")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$initanim$ = $FSSaladGrind_Init$$InitSpeed$ = %f(1.500000)$Anim$ = $FSSaladGrind_range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function call $Trick_Salad_BS$ arguments 
+				$Name$ = %sc(8,"BS Salad")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$initanim$ = $BSSaladGrind_Init$$InitSpeed$ = %f(1.500000)$Anim$ = $BSSaladGrind_range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_Salad_FS_180$
+			:i $FlipAndRotate$
+			:i call $Goto$ arguments 
+				$Trick_Salad_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Salad_BS_180$
+			:i $FlipAndRotate$
+			:i call $Goto$ arguments 
+				$Trick_Salad_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Hurricane_BS$
+			:i $Grind$:s{$Name$ = %sc(12,"BS Hurricane")$initanim$ = call $BSHurricaneGrind_Init$ arguments 
+					$InitSpeed$ = %f(1.500000)$Anim$ = $BSHurricaneGrind_Range$$OutAnim$ = $Init_Tailgrind$$OutAnimBackwards$ = %i(1,00000001)$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$Nollie$ = $yes$$FlipBeforeOutAnim$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $Grind$ arguments 
+					$SparksPos$ = $rear$:s}
+		:i endfunction
+		:i function $Trick_Hurricane_FS$
+			:i $Grind$:s{$Name$ = %sc(12,"FS Hurricane")$initanim$ = call $FSHurricaneGrind_Init$ arguments 
+					$InitSpeed$ = %f(1.500000)$Anim$ = $FSHurricaneGrind_Range$$OutAnim$ = $Nollie$$type$ = $Grind$$NoBlend$ = $NoBlend$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$FlipBeforeOutAnim$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_Hurricane_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Hurricane_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Hurricane_FS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Hurricane_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Darkslide_BS$
+			:i $Grind$:s{$Name$ = %sc(12,"BS Darkslide")$initanim$ = call $Darkslide_Init$ arguments 
+					$InitSpeed$ = %f(1.500000)$Anim$ = $Darkslide_Range$$OutAnim$ = $Darkslide_Out$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$OutAnimOnOllie$$BoardRotate$ = $yes$$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_Darkslide_FS$
+			:i $Grind$:s{$Name$ = %sc(12,"FS Darkslide")$initanim$ = call $FSDarkSlide_Init$ arguments 
+					$InitSpeed$ = %f(1.500000)$Anim$ = $FSDarkSlide_Range$$OutAnim$ = $FSDarkSlide_Out$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$OutAnimOnOllie$$BoardRotate$ = $yes$$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_Darkslide_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Darkslide_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Darkslide_FS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Darkslide_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_CrailSlide_BS$
+			:i $Grind$:s{$Name$ = %sc(14,"BS Crail Slide")$initanim$ = call $CrailSlide_Init$ arguments 
+					$Anim$ = $CrailSlide_Range$$OutAnim$ = $CrailSlide_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_CrailSlide_FS$
+			:i $Grind$:s{$Name$ = %sc(14,"FS Crail Slide")$initanim$ = call $CrailSlide_Init$ arguments 
+					$Anim$ = $CrailSlide_Range$$OutAnim$ = $CrailSlide_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_CrailSlide_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_CrailSlide_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_CrailSlide_FS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_CrailSlide_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_GrindOverturn_BS$
+			:i $Grind$:s{$Name$ = %sc(15,"BS 5-0 Overturn")$initanim$ = call $GrindOverturn_Init$ arguments 
+					$Anim$ = $GrindOverturn_Range$$OutAnim$ = $Init_Nosegrind$$OutAnimBackwards$ = %i(1,00000001)$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$FlipBeforeOutAnim$$Extratricks$ = $Extra_BS_Grinds$$Nollie$ = %i(1,00000001)$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $Grind$ arguments 
+					$SparksPos$ = $rear$:s}
+		:i endfunction
+		:i function $Trick_GrindOverturn_FS$
+			:i $Grind$:s{$Name$ = %sc(15,"FS 5-0 Overturn")$initanim$ = call $GrindOverturn_Init$ arguments 
+					$Anim$ = $GrindOverturn_Range$$OutAnim$ = $Init_Nosegrind$$OutAnimBackwards$ = %i(1,00000001)$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$FlipBeforeOutAnim$$Extratricks$ = $Extra_FS_Grinds$$Nollie$ = %i(1,00000001)$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $Grind$ arguments 
+					$SparksPos$ = $rear$:s}
+		:i endfunction
+		:i function $Trick_GrindOverturn_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_GrindOverturn_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_GrindOverturn_FS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_GrindOverturn_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_HangTenNoseGrind_BS$
+			:i $Grind$:s{$Name$ = %sc(18,"Hang Ten Nosegrind")$initanim$ = call $HangTenNoseGrind_Init$ arguments 
+					$InitSpeed$ = %f(1.500000)$Anim$ = $HangTenNoseGrind_Range$$OutAnim$ = $HangTenNoseGrind_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$Nollie$$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_HangTenNoseGrind_FS$
+			:i $Grind$:s{$Name$ = %sc(18,"Hang Ten Nosegrind")$initanim$ = call $HangTenNoseGrind_Init$ arguments 
+					$InitSpeed$ = %f(1.500000)$Anim$ = $HangTenNoseGrind_Range$$OutAnim$ = $HangTenNoseGrind_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$Nollie$$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_HangTenNoseGrind_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_HangTenNoseGrind_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_HangTenNoseGrind_FS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_HangTenNoseGrind_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_NosegrindPivot_BS$
+			:i $Grind$:s{$Name$ = %sc(18,"Nosegrind to Pivot")$initanim$ = call $NosegrindPivot_Init$ arguments 
+					$InitSpeed$ = %f(1.750000)$Anim$ = $NosegrindPivot_Range$$OutAnim$ = $Init_Tailgrind$$OutAnimBackwards$ = %i(1,00000001)$NoBlend$ = $NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$BoardRotate$ = $yes$$FlipBeforeOutAnim$$EarlyOut$ = $Init_Tailgrind$$Extratricks$ = $Extra_BS_Grinds$$IsATap$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $Grind$ arguments 
+					$SparksPos$ = $front$:s}
+		:i endfunction
+		:i function $Trick_NosegrindPivot_FS$
+			:i call $Goto$ arguments 
+				$Trick_NosegrindPivot_BS$$Params$ = :s{$IsExtra$ = $IsExtra$:s}
+		:i endfunction
+		:i function $Trick_NosegrindPivot_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_NosegrindPivot_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_NosegrindPivot_FS_180$
+			:i call $Goto$ arguments 
+				$Trick_NosegrindPivot_BS_180$
+		:i endfunction
+		:i function call $Trick_Muska_Burn_BS$ arguments 
+				$Name$ = %sc(19,"BS Muska 5-0 Flames")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Muska_Burn_init$$Anim$ = $Special_Muska_Burn_range$$OutAnim$ = $Special_Muska_Burn_out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparkPos$ = call $rear$ arguments 
+					$Stream$ = $Spec_Muska01$:s}
+		:i endfunction
+		:i function call $Trick_Muska_Burn_FS$ arguments 
+				$Name$ = %sc(19,"FS Muska 5-0 Flames")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Muska_Burn_init$$Anim$ = $Special_Muska_Burn_range$$OutAnim$ = $Special_Muska_Burn_out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$Stream$ = $Spec_Muska01$:s}
+		:i endfunction
+		:i function $Trick_Muska_Burn_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Muska_Burn_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Muska_Burn_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Muska_Burn_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_Worm_BS$ arguments 
+				$Name$ = %sc(7,"BS Worm")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Muska_Worm_Init$$Anim$ = $Special_Muska_Worm_idle$$Idle$$OutAnim$ = $Special_Muska_Worm_out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparkPos$ = call $rear$ arguments 
+					$Stream$ = $Spec_Muska02$:s}
+		:i endfunction
+		:i function call $Trick_Worm_FS$ arguments 
+				$Name$ = %sc(7,"FS Worm")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Muska_Worm_Init$$Anim$ = $Special_Muska_Worm_idle$$Idle$$OutAnim$ = $Special_Muska_Worm_out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$Stream$ = $Spec_Muska02$:s}
+		:i endfunction
+		:i function $Trick_Worm_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Worm_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Worm_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Worm_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_TheBird_BS$ arguments 
+				$Name$ = %sc(10,"BS TheBird")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Hand_TheBird_Init$$Anim$ = $Special_Hand_TheBird_Range$$OutAnim$ = $Special_Hand_TheBird_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $SparkPos$ = call $rear$ arguments 
+					$Stream$ = $Spec_TheHand01$:s}
+		:i endfunction
+		:i function call $Trick_TheBird_FS$ arguments 
+				$Name$ = %sc(10,"FS TheBird")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Hand_TheBird_Init$$Anim$ = $Special_Hand_TheBird_Range$$OutAnim$ = $Special_Hand_TheBird_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$Stream$ = $Spec_TheHand01$:s}
+		:i endfunction
+		:i function $Trick_TheBird_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_TheBird_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_TheBird_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_TheBird_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_BullF_Sword_BS$ arguments 
+				$Name$ = %sc(21,"BS Espana Sword Slide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_BullF_Sword_Init$$Anim$ = $Special_BullF_Sword_Idle$$Idle$$OutAnim$ = $Special_BullF_Sword_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$SparkPos$ = $rear$$SpecialItem_details$ = $Sword_details$$Stream$ = $Spec_Toreador01$:s}
+		:i endfunction
+		:i function call $Trick_BullF_Sword_FS$ arguments 
+				$Name$ = %sc(21,"FS Espana Sword Slide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_BullF_Sword_Init$$Anim$ = $Special_BullF_Sword_Idle$$Idle$$OutAnim$ = $Special_BullF_Sword_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$SpecialItem_details$ = $Sword_details$$Stream$ = $Spec_Toreador01$:s}
+		:i endfunction
+		:i function $Trick_BullF_Sword_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_BullF_Sword_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_BullF_Sword_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_BullF_Sword_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_Bam_Chainsaw_BS$ arguments 
+				$Name$ = %sc(18,"BS Chainsaw Rocker")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Bam_Chainsaw_Init$$Anim$ = $Special_Bam_Chainsaw_Idle$$Idle$$OutAnim$ = $Special_Bam_Chainsaw_Out$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$SparkPos$ = $rear$$SpecialItem_details$ = $Chainsaw_details$$Stream$ = $Spec_Margera02$:s}
+		:i endfunction
+		:i function call $Trick_Bam_Chainsaw_FS$ arguments 
+				$Name$ = %sc(18,"FS Chainsaw Rocker")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Bam_Chainsaw_Init$$Anim$ = $Special_Bam_Chainsaw_Idle$$Idle$$OutAnim$ = $Special_Bam_Chainsaw_Out$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$SpecialItem_details$ = $Chainsaw_details$$Stream$ = $Spec_Margera02$:s}
+		:i endfunction
+		:i function $Trick_Bam_Chainsaw_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Bam_Chainsaw_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Bam_Chainsaw_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Bam_Chainsaw_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_ShecklerPrimo_BS$ arguments 
+				$Name$ = %sc(8,"BS Shark")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Sheckler_Primo_Init$$Anim$ = $Special_Sheckler_Primo_Range$$OutAnim$ = $Special_Sheckler_Primo_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$SparkPos$ = $rear$$SpecialItem_details$ = $Shark_details$$Stream$ = $Spec_Sheckler02$:s}
+		:i endfunction
+		:i function call $Trick_ShecklerPrimo_FS$ arguments 
+				$Name$ = %sc(8,"FS Shark")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Sheckler_Primo_Init$$Anim$ = $Special_Sheckler_Primo_Range$$OutAnim$ = $Special_Sheckler_Primo_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$SpecialItem_details$ = $Shark_details$$Stream$ = $Spec_Sheckler02$:s}
+		:i endfunction
+		:i function $Trick_ShecklerPrimo_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_ShecklerPrimo_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_ShecklerPrimo_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_ShecklerPrimo_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_Waxslide_BS$ arguments 
+				$Name$ = %sc(11,"BS Waxslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Shrek_Waxslide_Init$$Anim$ = $Special_Shrek_Waxslide_Range$$OutAnim$ = $Special_Shrek_Waxslide_Out$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$SparkPos$ = $rear$$Stream$ = $Spec_Shrek02$:s}
+		:i endfunction
+		:i function call $Trick_Waxslide_FS$ arguments 
+				$Name$ = %sc(11,"FS Waxslide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Shrek_Waxslide_Init$$Anim$ = $Special_Shrek_Waxslide_Range$$OutAnim$ = $Special_Shrek_Waxslide_Out$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$Stream$ = $Spec_Shrek02$:s}
+		:i endfunction
+		:i function $Trick_Waxslide_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Waxslide_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Waxslide_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Waxslide_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_Hero_BS$ arguments 
+				$Name$ = %sc(7,"BS Hero")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Soldier_AmerHero2_Init$$Anim$ = $Special_Soldier_AmerHero2_Idle$$Idle$$OutAnim$ = $Special_Soldier_AmerHero2_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$SparkPos$ = $rear$$SpecialItem_details$ = $Flag_details$$Stream$ = $Spec_CallofDuty02$:s}
+		:i endfunction
+		:i function call $Trick_Hero_FS$ arguments 
+				$Name$ = %sc(7,"FS Hero")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Soldier_AmerHero2_Init$$Anim$ = $Special_Soldier_AmerHero2_Idle$$Idle$$OutAnim$ = $Special_Soldier_AmerHero2_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$SpecialItem_details$ = $Flag_details$$Stream$ = $Spec_CallofDuty02$:s}
+		:i endfunction
+		:i function $Trick_Hero_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Hero_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Hero_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Hero_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_RockNRollSwitch_BS$ arguments 
+				$Name$ = %sc(17,"BS Lip Bodyvarial")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Bob_RockNRollSwitch_Init$$Anim$ = $Special_Bob_RockNRollSwitch_Idle$$Idle$$OutAnim$ = $Special_Bob_RockNRollSwitch_Out$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$SparkPos$ = $rear$$Stream$ = $Spec_Burnquist02$:s}
+		:i endfunction
+		:i function call $Trick_RockNRollSwitch_FS$ arguments 
+				$Name$ = %sc(19,"FS Board Bodyvarial")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_Bob_RockNRollSwitch_Init$$Anim$ = $Special_Bob_RockNRollSwitch_Idle$$Idle$$OutAnim$ = $Special_Bob_RockNRollSwitch_Out$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$Stream$ = $Spec_Burnquist02$:s}
+		:i endfunction
+		:i function $Trick_RockNRollSwitch_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_RockNRollSwitch_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_RockNRollSwitch_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_RockNRollSwitch_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_BiteBoard_BS$ arguments 
+				$Name$ = %sc(10,"Bite Board")
+			:i if $BoardIsRotated$
+				:i $BoardRotate$
+			:i endif
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_SteveO_BiteBoard$$Anim$ = $FiftyFifty2_range$$OutAnim$ = $Init_FiftyFifty$$OutAnimBackwards$ = %i(1,00000001)$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$SparkPos$ = $rear$$Stream$ = $Spec_SteveO01$:s}
+		:i endfunction
+		:i function call $Trick_BiteBoard_FS$ arguments 
+				$Name$ = %sc(10,"Bite Board")
+			:i if $BoardIsRotated$
+				:i $BoardRotate$
+			:i endif
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(600,00000258)$initanim$ = $Special_SteveO_BiteBoard$$Anim$ = $FiftyFifty2_range$$OutAnim$ = $Init_FiftyFifty$$OutAnimBackwards$ = %i(1,00000001)$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$$Stream$ = $Spec_SteveO01$:s}
+		:i endfunction
+		:i function $Trick_BiteBoard_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_BiteBoard_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_BiteBoard_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_BiteBoard_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Franklin_Grind2$
+			:i call $SpawnScript$ arguments 
+				$Franklin_Grind_SFX$
+			:i $Grind$:s{$Name$ = %sc(17,"Franklin Grind!!!")$score$ = %i(600,00000258)$initanim$ = call $Special_FranklinGrind_Init$ arguments 
+					$Anim$ = $Special_FranklinGrind_Idle$$Idle$$OutAnim$ = $Special_FranklinGrind_Out$$type$ = $slide$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$IsSpecial$$OutAnimOnOllie$$Nollie$ = $no$$Extratricks$ = $Extra_BS_Grinds$$SpecialItem_details$ = $FranklinKite_details$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_Franklin_Grind2_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Franklin_Grind2$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Shortbus2$
+			:i $Grind$:s{$Name$ = %sc(12,"Stupid Grind")$score$ = %i(500,000001f4)$initanim$ = call $Shortbus_Init$ arguments 
+					$Anim$ = $Shortbus_idle$$Idle$$OutAnim$ = $Shortbus_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Nollie$ = $yes$$IsSpecial$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_Shortbus2_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Shortbus2$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_RodneyGrind2$
+			:i $Grind$:s{$Name$ = %sc(12,"Rodney Primo")$score$ = %i(500,000001f4)$initanim$ = call $RodneyGrind_Init$ arguments 
+					$Anim$ = $RodneyGrind_range$$OutAnim$ = $RodneyGrind_Out$$type$ = $Grind$$BoardRotate$ = $yes$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Nollie$ = $yes$$IsSpecial$$InitSpeed$ = %f(0.700000)$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_GrindNBarf2$
+			:i $Grind$:s{$Name$ = %sc(12,"Grind N Barf")$InitSpeed$ = %f(1.500000)$score$ = %i(500,000001f4)$initanim$ = call $GrindNBarf_Init$ arguments 
+					$Anim$ = $GrindNBarf_range$$OutAnim$ = $GrindNBarf_Out$$type$ = $Grind$$BoardRotate$ = $yes$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Nollie$ = $yes$$IsSpecial$$OutAnimOnOllie$$Stream$ = $DryHeaveSpecial$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_RowleyDarkSlideHandStand2$
+			:i $Grind$:s{$Name$ = %sc(19,"Darkslide Handstand")$score$ = %i(700,000002bc)$initanim$ = call $RowleyDarkSlideHandStand_Init$ arguments 
+					$Anim$ = $RowleyDarkSlideHandStand_range$$OutAnim$ = $RowleyDarkSlideHandStand_Out$$type$ = $slide$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_RowleyDarkSlideHandStand2_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_RowleyDarkSlideHandStand2$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_PrimoHandStand2$
+			:i $Grind$:s{$Name$ = %sc(15,"Primo Handstand")$score$ = %i(700,000002bc)$initanim$ = call $PrimoHandStand_Init$ arguments 
+					$Anim$ = $PrimoHandStand_range$$OutAnim$ = $PrimoHandStand_Out$$type$ = $slide$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$OutAnimOnOllie$$IsSpecial$$Stream$ = $nj_pipeignite$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_PrimoHandStand2_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_PrimoHandStand2$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_OneFootDarkSlide2$
+			:i $Grind$:s{$Name$ = %sc(18,"One Foot Darkslide")$score$ = %i(600,00000258)$initanim$ = call $OneFootDarkSlide_Init$ arguments 
+					$Anim$ = $OneFootDarkSlide_range$$OutAnim$ = $OneFootDarkSlide_Out$$type$ = $slide$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$IsSpecial$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_OneFootDarkslide2_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_OneFootDarkSlide2$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_FiftyFiftySwitcheroo2$
+			:i $Grind$:s{$Name$ = %sc(15,"5050 Switcheroo")$score$ = %i(600,00000258)$initanim$ = call $FiftyFiftySwitcheroo_Init$ arguments 
+					$Anim$ = $FiftyFiftySwitcheroo_Idle$$Idle$$type$ = $Grind$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Speed$ = %i(3,00000003)$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_HCNHDF2$
+			:i $Grind$:s{$Name$ = %sc(16,"Crooks DarkSlide")$score$ = %i(700,000002bc)$initanim$ = call $HCNHDF_Init$ arguments 
+					$Anim$ = $HCNHDF_range$$OutAnim$ = $HCNHDF_Out$$InitSpeed$ = %f(1.500000)$type$ = $slide$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$IsSpecial$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_HCNHDF2_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_HCNHDF2$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_FSNollie360FlipCrook2$
+			:i $Grind$:s{$Name$ = %sc(20,"Nollie 360flip Crook")$score$ = %i(600,00000258)$initanim$ = call $FSNollie360FlipCrook_Init$ arguments 
+					$Anim$ = $FSNollie360FlipCrook_range$$OutAnim$ = $FSNollie360FlipCrook_Out$$type$ = $Grind$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_FSNollie360FlipCrook2_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_FSNollie360FlipCrook2$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_MoonwalkGrind2$
+			:i $Grind$:s{$Name$ = %sc(15,"Moonwalk Five-O")$score$ = %i(600,00000258)$initanim$ = call $Moonwalkgrind_Init$ arguments 
+					$Anim$ = $Moonwalkgrind_idle$$Idle$$OutAnim$ = $Moonwalkgrind_Out$$type$ = $Grind$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$IsSpecial$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_MoonwalkGrind2_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_MoonwalkGrind2$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_360ShovitNoseGrind2$
+			:i $Grind$:s{$Name$ = %sc(22,"360 Shove-It NoseGrind")$score$ = %i(600,00000258)$initanim$ = call $_360ShovitNoseGrind_Init$ arguments 
+					$Anim$ = $_360ShovitNoseGrind_range$$InitSpeed$ = %f(2.000000)$OutAnim$ = $_360ShovitNoseGrind_Out$$type$ = $Grind$$NoBlend$ = $yes$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_360ShovitNoseGrind2_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_360ShovitNoseGrind2$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Coffin_BS$
+			:i $Grind$:s{$Name$ = %sc(9,"BS Coffin")$score$ = %i(500,000001f4)$initanim$ = call $CoffinGrind_Init$ arguments 
+					$Anim$ = $CoffinGrind_Range$$OutAnim$ = $CoffinGrind_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_Coffin_FS$
+			:i $Grind$:s{$Name$ = %sc(9,"FS Coffin")$score$ = %i(500,000001f4)$initanim$ = call $CoffinGrind_Init$ arguments 
+					$Anim$ = $CoffinGrind_Range$$OutAnim$ = $CoffinGrind_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$OutAnimOnOllie$$Extratricks$ = $Extra_BS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_Coffin_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Coffin_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_Coffin_FS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_Coffin_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_fandangle_BS$
+			:i $Grind$:s{$Name$ = %sc(12,"BS Fandangle")$score$ = %i(500,000001f4)$initanim$ = call $fandangle_Init$ arguments 
+					$Anim$ = $fandangle_Range$$OutAnim$ = $Fandangle_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$$OutAnimOnOllie$$BoardRotate$ = $yes$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_fandangle_FS$
+			:i $Grind$:s{$Name$ = %sc(12,"FS Fandangle")$score$ = %i(500,000001f4)$initanim$ = call $fandangle_Init$ arguments 
+					$Anim$ = $fandangle_Range$$OutAnim$ = $Fandangle_Out$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$OutAnimOnOllie$$BoardRotate$ = $yes$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_fandangle_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_fandangle_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_fandangle_FS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_fandangle_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_BigHitter_BS$ arguments 
+				$Extratricks$ = $Extra_BS_Grinds$
+			:i $Grind$:s{$Name$ = %sc(13,"Big Hitter II")$score$ = %i(500,000001f4)$initanim$ = call $BigHitter_Init$ arguments 
+					$Anim$ = $BigHitter_Range$$OutAnim$ = $BigHitter_out$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$IsSpecial$$Extratricks$ = %GLOBAL%$Extratricks$$OutAnimOnOllie$:s}
+		:i endfunction
+		:i function $Trick_BigHitter_FS$
+			:i call $Goto$ arguments 
+				$Trick_BigHitter_BS$$Params$ = :s{$Extratricks$ = $Extra_FS_Grinds$:s}
+		:i endfunction
+		:i function $Trick_BigHitter_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_BigHitter_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_BigHitter_FS_180$
+			:i call $Goto$ arguments 
+				$Trick_BigHitter_BS_180$
+		:i endfunction
+		:i function $Trick_TailblockSlide_BS$
+			:i $Grind$:s{$Name$ = %sc(15,"Tailblock Slide")$score$ = %i(500,000001f4)$initanim$ = call $TailblockSlide_Init$ arguments 
+					$Anim$ = $TailblockSlide_Range$$OutAnim$ = $TailblockSlide_Init$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = %GLOBAL%$Extratricks$$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$:s}
+		:i endfunction
+		:i function $Trick_TailblockSlide_FS$
+			:i call $Goto$ arguments 
+				$Trick_TailblockSlide_BS$$Params$ = :s{$Extratricks$ = $Extra_FS_Grinds$:s}
+		:i endfunction
+		:i function $Trick_TailblockSlide_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_TailblockSlide_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_TailblockSlide_FS_180$
+			:i call $Goto$ arguments 
+				$Trick_TailblockSlide_BS_180$
+		:i endfunction
+		:i function $Trick_DrunkGrind_BS$
+			:i $Grind$:s{$Name$ = %sc(11,"S.U.I Grind")$score$ = %i(500,000001f4)$initanim$ = call $DrunkGrind_Init$ arguments 
+					$Anim$ = $DrunkGrind_Idle$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$OutAnimOnOllie$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_NoseSlideLipSlide_FS$
+			:i if $BadLedge$
+				:i call $Goto$ arguments 
+					$Trick_NoseSlideLipSlide_BS_ok$
+			:i else 
+				:i call $Goto$ arguments 
+					$Trick_NoseSlideLipSlide_FS_ok$
+			:i endif
+		:i endfunction
+		:i function call $Trick_NoseSlideLipSlide_FS_ok$ arguments 
+				$Name$ = %sc(21,"FS Noseslide LipSlide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(500,000001f4)$initanim$ = $FSNoseSlideLipSlide$$Anim$ = $BSBoardslide_range$$Nollie$ = $yes$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsSpecial$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $slide$ arguments 
+					$SparkPos$ = $front$:s}
+		:i endfunction
+		:i function $Trick_NoseSlideLipSlide_BS$
+			:i if $BadLedge$
+				:i call $Goto$ arguments 
+					$Trick_NoseSlideLipSlide_FS_ok$
+			:i else 
+				:i call $Goto$ arguments 
+					$Trick_NoseSlideLipSlide_BS_ok$
+			:i endif
+		:i endfunction
+		:i function call $Trick_NoseSlideLipSlide_BS_ok$ arguments 
+				$Name$ = %sc(21,"BS NoseSlide LipSlide")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(500,000001f4)$initanim$ = $BSNoseSlideLipSlide$$Anim$ = $FSBoardslide_range$$Nollie$ = $yes$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsSpecial$$IsExtra$ = %GLOBAL%$IsExtra$
+				:i $type$ = call $slide$ arguments 
+					$SparkPos$ = $rear$:s}
+		:i endfunction
+		:i function $Trick_NoseSlideLipSlide_FS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_NoseSlideLipSlide_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_NoseSlideLipSlide_BS_180$
+			:i $FlipAndRotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_NoseSlideLipSlide_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_CrookedBigSpin_BS$
+			:i $Grind$:s{$Name$ = %sc(33,"Crook BigSpinFlip Switch FS Crook")$score$ = %i(500,000001f4)call $special_item$ arguments 
+					$initanim$ = $CrookBigSpinFlipCrook$$Anim$ = $FSCrooked_range$$OutAnim$ = $Init_FSCrooked$$OutAnimBackwards$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $BackwardsGrindBails$ arguments 
+					$IsSpecial$$FlipAfterInit$$Extratricks$ = $Extra_FS_Grinds$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_CrookedBigSpin_FS$
+			:i call $Goto$ arguments 
+				$Trick_CrookedBigSpin_BS$$Params$ = :s{$NoBlend$ = $yes$$Name$ = %sc(31,"Overcrook BigSpinFlip Overcrook"):s}
+		:i endfunction
+		:i function $Trick_CrookedBigSpin_BS_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_CrookedBigSpin_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_CrookedBigSpin_FS_180$
+			:i call $Goto$ arguments 
+				$Trick_CrookedBigSpin_BS_180$
+		:i endfunction
+		:i function $Trick_50Fingerflip2$
+			:i $Grind$:s{$Name$ = %sc(24,"5-0 Fingerflip Nosegrind")$score$ = %i(500,000001f4)$initanim$ = call $TailGrindFingerFlip$ arguments 
+					$Anim$ = $NoseGrind_Range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_BS_Grinds$:s}
+		:i endfunction
+		:i function $Trick_50Fingerflip2_180$
+			:i call $BackwardsGrind$ arguments 
+				$Grind$ = $Trick_50Fingerflip2$
+		:i endfunction
+		:i function $Trick_DaffyBrokenGrind2$
+			:i $Grind$:s{$Name$ = %sc(11,"Daffy Grind")$score$ = %i(500,000001f4)$initanim$ = call $DaffyBroken_Init$ arguments 
+					$Anim$ = $DaffyBroken_Range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$IsSpecial$$Extratricks$ = $Extra_FS_Grinds$$SpecialItem_details$ = $bustedboard_details$:s}
+		:i endfunction
+		:i function $Trick_DaffyBrokenGrind2_180$
+			:i call $BackwardsGrind$ arguments 
+				$Grind$ = $Trick_DaffyBrokenGrind2$
+		:i endfunction
+		:i function $Trick_BballSlide2_180$
+			:i call $BackwardsGrind$ arguments 
+				$Grind$ = $Trick_BballSlide2$
+		:i endfunction
+		:i function $Trick_ElbowSmash2$
+			:i $Grind$:s{$Name$ = %sc(11,"Elbow Smash")$score$ = %i(500,000001f4)$initanim$ = call $ElbowSmash_Init$ arguments 
+					$Anim$ = $ElbowSmash_Idle$$Idle$$OutAnim$ = $Elbowsmash_out$$OutAnimOnOllie$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$$Idle$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$ScreenShake$ = %i(60,0000003c)$IsSpecial$:s}
+		:i endfunction
+		:i function $Trick_ElbowSmash2_180$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i call $Goto$ arguments 
+				$Trick_ElbowSmash2$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function call $Trick_OneFootSmith_FS$ arguments 
+				$Name$ = %sc(17,"FS One Foot Smith")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(500,000001f4)$initanim$ = $SmithFS_Init$$Anim$ = $SmithFS_Range$$type$ = $slide$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $GrindFallLR$ arguments 
+					$Extratricks$ = $Extra_FS_Grinds$$IsSpecial$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function call $Trick_OneFootSmith_BS$ arguments 
+				$Name$ = %sc(17,"BS One Foot Smith")
+			:i $Grind$:s{$Name$ = %GLOBAL%call $Name$ arguments 
+					$score$ = %i(500,000001f4)$initanim$ = $Smith_Init$$Anim$ = $Smith_Range$$type$ = $Grind$$NoBlend$ = %GLOBAL%$NoBlend$
+				:i $GrindBail$ = call $FiftyFiftyFall$ arguments 
+					$Extratricks$ = $Extra_BS_Grinds$$IsSpecial$$IsExtra$ = %GLOBAL%$IsExtra$:s}
+		:i endfunction
+		:i function $Trick_OneFootSmith_FS_180$
+			:i $FlipAndRotate$
+			:i call $Goto$ arguments 
+				$Trick_OneFootSmith_BS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $Trick_OneFootSmith_BS_180$
+			:i $FlipAndRotate$
+			:i call $Goto$ arguments 
+				$Trick_OneFootSmith_FS$$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $BackwardsGrind$
+			:i $Rotate$
+			:i $BoardRotateAfter$
+			:i $Goto$%GLOBAL%call $Grind$ arguments 
+				$Params$ = :s{$NoBlend$ = $yes$:s}
+		:i endfunction
+		:i function $PointRail$
+			:i call $Vibrate$ arguments 
+				$Actuator$ = %i(0,00000000)$Percent$ = %i(50,00000032)$Duration$ = %f(0.100000)
+			:i call $Obj_SpawnScript$ arguments 
+				$PointRailSparks$
+			:i call $BroadcastEvent$ arguments 
+				$type$ = $SkaterPointRail$
+			:i $SetTrickName$%sc(15,"Kissed the Rail")
+			:i $SetTrickScore$%i(50,00000032)
+			:i call $Display$ arguments 
+				$NoMult$
+			:i call $Goto$ arguments 
+				$Airborne$$Params$ = :s{$AllowVibration$:s}
+		:i endfunction
+		:i function call $PointRailSpin$ arguments 
+				$init_anim$ = $natas_spin_init$$range_anim$ = $natas_spin_range$
+			:i call $SetException$ arguments 
+				$Ex$ = $Ollied$$Scr$ = $ExitPointRailSpin$
+			:i call $SetException$ arguments 
+				$Ex$ = $OffMeterTop$$Scr$ = $PointRailSpinBail$
+			:i call $SetException$ arguments 
+				$Ex$ = $OffMeterBottom$$Scr$ = $PointRailSpinBail$
+			:i call $SetException$ arguments 
+				$Ex$ = $SkaterCollideBail$$Scr$ = $SkaterCollideBail$
+			:i call $SetRailSound$ arguments 
+				$slide$
+			:i call $SetQueueTricks$ arguments 
+				$NoTricks$
+			:i if call $SkaterIsNamed$ arguments 
+					$natas$
+				:i $init_anim$ = $special_natas_spin_init$
+				:i $range_anim$ = $special_natas_spin_range$
+			:i endif
+			:i call $PlayAnim$ arguments 
+				$Anim$ = %GLOBAL%$init_anim$
+			:i $Obj_WaitAnimFinished$
+			:i call $DoBalanceTrick$ arguments 
+				$ButtonA$ = $Right$$ButtonB$ = $Left$$type$ = $Grind$
+			:i call $PlayAnim$ arguments 
+				$Anim$ = %GLOBAL%$range_anim$$wobble$
+			:i $SetTrickName$%sc(0,"")
+			:i $SetTrickScore$%i(0,00000000)
+			:i call $Display$ arguments 
+				$Blockspin$
+			:i $SetTrickName$%sc(10,"Natas Spin")
+			:i $SetTrickScore$%i(50,00000032)
+			:i call $Display$ arguments 
+				$natas$
+			:i call $Vibrate$ arguments 
+				$Actuator$ = %i(1,00000001)$Percent$ = %i(50,00000032)$Duration$ = %f(0.250000)
+			:i call $Vibrate$ arguments 
+				$Actuator$ = %i(0,00000000)$Percent$ = %i(50,00000032)
+			:i call $OnExitRun$ arguments 
+				$Natas_Exit$
+			:i $Block$
+		:i endfunction
+		:i function $Natas_Exit$
+			:i call $Vibrate$ arguments 
+				$Actuator$ = %i(0,00000000)$Percent$ = %i(0,00000000)
+			:i $SetTrickName$%sc(0,"")
+			:i $SetTrickScore$%i(0,00000000)
+			:i call $Display$ arguments 
+				$Blockspin$
+		:i endfunction
+		:i $natas_exit_speed$ = %i(300,0000012c)
+		:i function $ExitPointRailSpin$
+			:i $StopBalanceTrick$
+			:i $NoRailTricks$
+			:i call $Obj_KillSpawnedScript$ arguments 
+				$Name$ = $turn_on_rail_tricks$
+			:i call $Obj_SpawnScript$ arguments 
+				$turn_on_rail_tricks$
+			:i if $UpPressed$
+				:i if $RightPressed$
+					:i call $CheckNatasExitDirection$ arguments 
+						$dir$ = $UpRight$
+				:i else 
+					:i if $LeftPressed$
+						:i call $CheckNatasExitDirection$ arguments 
+							$dir$ = $UpLeft$
+					:i else 
+						:i call $CheckNatasExitDirection$ arguments 
+							$dir$ = $Up$
+					:i endif
+				:i endif
+			:i else 
+				:i if $DownPressed$
+					:i if $RightPressed$
+						:i call $CheckNatasExitDirection$ arguments 
+							$dir$ = $DownRight$
+					:i else 
+						:i if $LeftPressed$
+							:i call $CheckNatasExitDirection$ arguments 
+								$dir$ = $DownLeft$
+						:i else 
+							:i call $CheckNatasExitDirection$ arguments 
+								$dir$ = $Down$
+						:i endif
+					:i endif
+				:i else 
+					:i if $RightPressed$
+						:i call $CheckNatasExitDirection$ arguments 
+							$dir$ = $Right$
+					:i else 
+						:i if $LeftPressed$
+							:i call $CheckNatasExitDirection$ arguments 
+								$dir$ = $Left$
+						:i endif
+					:i endif
+				:i endif
+			:i endif
+			:i call $SetSpeed$ arguments 
+				$natas_exit_speed$
+			:i $Jump$
+			:i $DoNextTrick$
+			:i call $Ollie$ arguments 
+				$OutAnim$ = $Natas_spin_out$$JumpSpeed$ = %i(0,00000000)
+		:i endfunction
+		:i function call $turn_on_rail_tricks$ arguments 
+				$time$ = %i(10,0000000a)
+			:i $Wait$%GLOBAL%call $time$ arguments 
+				$frames$
+			:i $AllowRailtricks$
+		:i endfunction
+		:i function $PointRailSpinBail$
+			:i $SetSpeed$%i(200,000000c8)
+			:i $PitchBail$
+		:i endfunction
+		:i function $PointRailSparks$
+			:i call $SetSparksPos$ arguments 
+				$rear$
+			:i call $SparksOn$ arguments 
+				$RailNotRequired$
+			:i $Wait$%f(0.200000)$seconds$
+			:i $SparksOff$
+		:i endfunction
+		:i :end
+		
+
+#/ END

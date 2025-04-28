@@ -1,0 +1,157 @@
+// 1. Overall Update Loop & State Machine
+Every frame, the skater runs through roughly this sequence (in CSkaterCorePhysicsComponent::UpdatePhysics in SkaterCorePhysicsComponent.cpp):
+cpp
+CopyEdit
+// 1. Read controller & map to desired inputs
+m_pControlComponent->ReadInput(dt);
+
+// 2. Advance state machine (GROUND, AIR, RAIL, LIP, etc.)
+Switch (m_state) {
+  case GROUND: ApplyGroundPhysics(dt); break;
+  case AIR:    ApplyAirPhysics(dt);    break;
+  case RAIL:   ApplyRailPhysics(dt);   break;
+  case LIP:    ApplyLipLogic(dt);      break;
+}
+
+// 3. Integrate velocities
+m_position += m_velocity * dt;
+m_orientation = IntegrateAngularVelocity(m_orientation, m_angVel, dt);
+
+// 4. Resolve collisions & snap via AdjustPhysicsComponent
+m_pAdjustComponent->FixupPenetrations(dt);
+
+// 5. Update trick, balance, score, sound components
+m_pTrickComponent->Update(dt);
+m_pBalanceComponent->Update(dt);
+m_pScoreComponent  ->Update(dt);
+– This core loop lives in SkaterCorePhysicsComponent.cpp and drives every frame of play .
+
+B. Input Mapping & Stat‑Driven Parameters
+All player inputs (analog stick X/Y, buttons) are read in CSkaterPhysicsControlComponent::ReadInput (in SkaterPhysicsControlComponent.h/cpp). Key mappings:
+    • Forward/Back → throttle or brake
+    • Left/Right → turn on ground or spin in air
+    • Jump → queue a lip pop or manual/tuck in air
+    • Grind → hold to stay on rails or to start a manual
+Those raw inputs get stored as floats (m_stickForward, m_stickLateral, m_doJump, m_doGrind, etc.), then later used by the physics component to compute forces. Every force parameter is looked up via
+cpp
+CopyEdit
+float accelStat   = m_pSkater->GetScriptedStat("ACCEL",  dt);
+float topSpeed    = m_pSkater->GetScriptedStat("TOP_SPEED", dt);
+float groundFric  = m_pSkater->GetScriptedStat("GROUND_FRICTION", dt);
+…so you can tweak everything in data tables without touching code .
+
+C. Ground Physics Equations
+When in GROUND state, THUG does:
+    1. Compute Desired Acceleration
+cpp
+CopyEdit
+Vector3 forwardDir = m_orientation.Transform(Vector3(0,0,1));
+Vector3 accelForce = forwardDir * (m_stickForward * accelStat);
+m_velocity += accelForce * dt;
+    2. Clamp to Top Speed
+cpp
+CopyEdit
+float speed = m_velocity.Length();
+if (speed > topSpeed) 
+    m_velocity = m_velocity * (topSpeed / speed);
+    3. Apply Rolling Friction
+cpp
+CopyEdit
+// exponential decay: vel *= pow(friction, dt)
+m_velocity *= powf(groundFric, dt);
+    4. Slope Slide Component
+Each ground feeler returns a contact normal n; the code projects out the perpendicular:
+cpp
+CopyEdit
+Vector3 gravityProj = Dot(m_velocity, n) * n;
+m_velocity -= gravityProj * (1.0f - slopeFriction);
+Slope friction is another stat (SLOPE_FRICTION) .
+
+D. Air Physics & Rotation
+In AIR state:
+    1. Gravity & Drag
+cpp
+CopyEdit
+m_velocity += Vector3(0,-gravity,0) * dt;
+m_velocity *= powf(airFriction, dt);
+    2. Angular Drag
+cpp
+CopyEdit
+m_angVel *= powf(airAngularFriction, dt);
+    3. Player‑Controlled Rotation
+        ◦ Spin (around board's Y): lateral stick → spin torque
+        ◦ Flip (around local X): button combo → flip torque
+cpp
+CopyEdit
+m_angVel += stickX * spinSpeedStat * dt * upAxis;
+m_angVel += buttonFlip * flipSpeedStat * dt * rightAxis;
+    4. Orientation Integration
+The board's orientation quaternion q is updated by
+cpp
+CopyEdit
+q = Normalize(q + 0.5f * Quaternion(0, m_angVel) * q * dt);
+so you can mix spins + flips seamlessly .
+
+E. Ramp "Lip" Pop Logic
+When a toe/heel feeler hits a lip collider flagged in the map:
+    1. Detect Lip & Buffer
+A short timer (m_lipGraceTimer) prevents double-pops.
+    2. On Jump Button
+cpp
+CopyEdit
+Vector3 popImpulse = lipNormal * popStrengthStat
+                    + forwardDir * popForwardStat;
+m_velocity += popImpulse;
+    3. Switch State → AIR
+The Core physics drops you into AIR, carrying your popped velocity .
+
+F. Rail Grinding Math
+Entering RAIL state:
+    1. Find Closest Rail Segment via side-feeler raycasts in SkaterAdjustPhysicsComponent.
+    2. Project Velocity onto Rail
+cpp
+CopyEdit
+Vector3 railTangent = (p2 - p1).Normalized();
+m_velocity = railTangent * Dot(m_velocity, railTangent);
+    3. Apply Grind Friction
+cpp
+CopyEdit
+m_velocity *= powf(railFrictionStat, dt);
+    4. Rail Snap & Alignment
+Each frame the skater's board mesh is repositioned onto the rail with
+cpp
+CopyEdit
+pos = ClosestPointOnSegment(p1, p2, wheelPos);
+orient.AlignZ(railNormal);
+Grinds break on low speed or grind-button release .
+
+G. Balance Meter Dynamics
+Manuals & rail grinds use the same meter:
+    1. Stateful Balance Value b ∈ [–1,1], starts at 0.
+    2. Wobble + Player Correction
+cpp
+CopyEdit
+float wobble   = sin(time * wobbleFreq) * wobbleAmp;
+float desired  = (isManual ? stickY : 0.0f);
+b += (desired + wobble - b) * manualControlStat * dt;
+    3. Auto-Center & Bail
+        ◦ If |b| > 1 → TriggerBail().
+        ◦ If |b| < 0.05 → drift toward zero by abs(b)*manualRecoveryStat*dt.
+Stats "MANUAL_BALANCE" (wobbleAmp scale) and "MANUAL_CONTROL" (correction speed) tune the feel .
+
+H. Special Meter & Buffs
+Every successful trick adds points to the special bar. Once full:
+    1. Activate → sets a flag in ScoreComponent.
+    2. GetScriptedStat(name) sees this flag and returns
+cpp
+CopyEdit
+baseValue + (specialActive ? specialBonus : 0);
+so top speed, pop, spin, even grind friction get boosted by + 2–4 points each .
+
+✦ Next Steps for Your 1:1 Remake
+    • Port the exact state enum and transition table from SkaterCorePhysicsComponent.h/.cpp.
+    • Recreate the feelers (6 ground, 2 side for rails, 2 for lips) with equivalent raycasts.
+    • Load all stats from a human-editable table (like the game's .q files).
+    • Integrate the balance-meter equation verbatim (wobble + catch).
+    • Copy the quaternion integration routine for perfect aerial spin/flips.
+    • Wire up a special-state flag that gates stat boosts inside your stat-lookup function.

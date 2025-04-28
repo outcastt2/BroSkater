@@ -1,0 +1,665 @@
+#/ QB Script version 2.1 by RoQ www.HackTHPS.de
+%include "skater_vehicle.qb_table.qbi"   #/ Table file
+
+:i function $9c2a2902$
+	:i $77b88a5b$.call $7ad27c0c$ arguments 
+		$d96b4390$ = :a{$3034f818$$7d843102$$2786a839$$8c704e95$$a9e8c9a3$$1563d50f$$ece630ab$$ec0777a5$$ba165fcd$$1aafb5bb$:a}
+	:i $77b88a5b$.$eb7980a5$:s{%GLOBAL%call $0cf13170$ arguments 
+			$dfb971ff$ = %i(0,00000000):s}
+	:i call $c85364d1$ arguments 
+		$c5a76c31$
+:i endfunction
+:i $557a9a20$ = :a{
+	:i :s{call $92713680$ arguments 
+			$ec8b72f8$ = $b601103b$$90d8d2a6$ = $63862e12$:s}
+	:i :s{call $92713680$ arguments 
+			$ec8b72f8$ = $37336bf9$$90d8d2a6$ = $d21ede85$:s}
+	:i :s{call $92713680$ arguments 
+			$ec8b72f8$ = $701d10b4$$90d8d2a6$ = $d21ede85$:s}
+	:i :s{call $92713680$ arguments 
+			$ec8b72f8$ = $35756a75$$90d8d2a6$ = $d21ede85$:s}
+	:i :s{call $92713680$ arguments 
+			$ec8b72f8$ = $a9132e82$$90d8d2a6$ = $2cc122e0$:s}
+	:i :s{call $92713680$ arguments 
+			$ec8b72f8$ = $756167ab$$90d8d2a6$ = $19545854$:s}
+	:i :a}
+:i function call $c5a76c31$ arguments 
+		$55efb129$ = $e1b05531$
+	:i $36c11136$
+	:i if call $7b7166cf$ arguments 
+			$36fb0796$
+		:i $77b88a5b$.$d632414e$%GLOBAL%$36fb0796$
+	:i endif
+	:i $1584c91f$
+	:i $7b9e0c2c$
+	:i call $20b718df$ arguments 
+		$557a9a20$
+	:i $cc11fffe$
+	:i $dfa9fb29$%GLOBAL%$54ec5530$
+	:i $436456d2$
+	:i if call $7b7166cf$ arguments 
+			$35cb442d$
+		:i call $f5a6f0e8$ arguments 
+			$29e0c350$
+	:i else 
+		:i $f5a6f0e8$
+	:i endif
+	:i if $e8babf57$
+		:i $3e37fda3$
+	:i endif
+	:i if call $7b7166cf$ arguments 
+			$771a573a$
+		:i if NOT call $d52a8ed5$ arguments 
+				$35cffc5c$ = $96eee049$
+			:i call $ae44bbca$ arguments 
+				$35cffc5c$ = $96eee049$
+		:i endif
+		:i call $9fb2d4f1$ arguments 
+			$35cffc5c$ = $96eee049$$626f784d$ = %f(0.000000)
+	:i endif
+	:i if  (%GLOBAL%$2364860b$ = %i(1,00000001)) 
+		:i $91e219bc$
+	:i else 
+		:i $55f4bceb$
+	:i endif
+	:i if  (%GLOBAL%$6dd08c8c$ = %i(1,00000001)) 
+		:i $97fcdc34$
+	:i else 
+		:i $7e945702$
+	:i endif
+	:i if  (%GLOBAL%$b8d4a9a7$ = %i(1,00000001)) 
+		:i $00c4c8c4$
+	:i else 
+		:i $887ad2f8$
+	:i endif
+	:i if  (%GLOBAL%$387e05c7$ = %i(1,00000001)) 
+		:i $9a555a06$
+	:i else 
+		:i $591a68ec$
+	:i endif
+	:i if call $7b7166cf$ arguments 
+			$740fa8d8$
+		:i $861845b8$%GLOBAL%$740fa8d8$
+	:i else 
+		:i $20816e0f$
+	:i endif
+	:i if $cf5cee79$
+		:i $44a6f3e0$
+	:i endif
+	:i $fd2a24e9$
+	:i call $d59cd8fb$ arguments 
+		$f981dca1$ = $89d88123$
+	:i $82809286$
+	:i $cdc0c656$
+	:i $64783d8c$
+	:i $10600f29$
+	:i $3b980f51$%i(0,00000000)
+	:i $9b933b38$%GLOBAL%$d01c4592$
+	:i $ec6ac868$%i(0,00000000)
+	:i $77b88a5b$.$93e13197$
+	:i if call $7b7166cf$ arguments 
+			$7b3c7107$
+		:i $36c11136$
+		:i if  (%GLOBAL%$54ec5530$ = $46d6d2d8$) 
+			:i $77b88a5b$.call $d632414e$ arguments 
+				$a7441949$
+			:i $77b88a5b$.call $180ea2af$ arguments 
+				$a7441949$
+		:i else 
+			:i $77b88a5b$.$d632414e$%GLOBAL%$7b3c7107$
+			:i $77b88a5b$.$180ea2af$%GLOBAL%$7b3c7107$
+		:i endif
+	:i endif
+	:i $c1346d25$
+	:i if call $7b7166cf$ arguments 
+			$55efb129$
+		:i %GLOBAL%$55efb129$
+	:i endif
+	:i call $7fa39fad$ arguments 
+		$6688b083$
+:i endfunction
+:i function $6688b083$
+	:i $36c11136$
+	:i if call $7b7166cf$ arguments 
+			$36fb0796$
+		:i $77b88a5b$.$d632414e$%GLOBAL%$36fb0796$
+	:i endif
+	:i if call $7b7166cf$ arguments 
+			$ec571744$
+		:i $425cca11$
+	:i endif
+	:i call $cfef1f90$ arguments 
+		$ec8b72f8$ = $a9132e82$$90d8d2a6$ = $2cc122e0$
+	:i call $cfef1f90$ arguments 
+		$ec8b72f8$ = $756167ab$$90d8d2a6$ = $19545854$
+	:i $b8a553e5$
+	:i call $0a5f8adf$ arguments 
+		$31c14f11$ = %i(0,00000000)$c67f499e$ = %i(0,00000000)
+	:i call $eb7980a5$ arguments 
+		$be2b2385$ = %i(0,00000000)
+	:i call $cfef1f90$ arguments 
+		$ec8b72f8$ = $28fbfe8f$$90d8d2a6$ = $5457caf9$
+	:i $3124920f$
+	:i if NOT $f287a25e$
+		:i call $96bf8e94$ arguments 
+			$977c0058$
+	:i endif
+	:i if call $7b7166cf$ arguments 
+			$cadec91a$
+		:i call $0a08cf1f$ arguments 
+			$89455d06$
+	:i else 
+		:i call $0a08cf1f$ arguments 
+			$710d5972$
+	:i endif
+	:i $436456d2$
+	:i call $91721e0b$ arguments 
+		$a49b5498$ = %GLOBAL%$ca291455$$6c2e794f$$09fe09fe$
+	:i $49b337d1$
+:i endfunction
+:i function $49b337d1$
+	:i $36c11136$
+	:i if call $7b7166cf$ arguments 
+			$36fb0796$
+		:i $77b88a5b$.$d632414e$%GLOBAL%$36fb0796$
+	:i endif
+	:i if call $7b7166cf$ arguments 
+			$7b3c7107$
+		:i if  (%GLOBAL%$54ec5530$ = $46d6d2d8$) 
+			:i $77b88a5b$.call $d632414e$ arguments 
+				$a7441949$
+			:i $77b88a5b$.call $180ea2af$ arguments 
+				$a7441949$
+		:i else 
+			:i $77b88a5b$.$d632414e$%GLOBAL%$7b3c7107$
+			:i $77b88a5b$.$180ea2af$%GLOBAL%$7b3c7107$
+		:i endif
+	:i endif
+	:i while
+		
+		:i if NOT $e0cf68e1$
+			:i call $c85364d1$ arguments 
+				$0448de1d$
+		:i endif
+		:i if call $7b7166cf$ arguments 
+				$cadec91a$
+			:i $4e9a8f78$
+		:i endif
+		:i if  (%GLOBAL%$54ec5530$ = $46d6d2d8$) 
+			:i if $57b9aa26$%i(0,00000000)
+				:i if NOT call $d681fc05$ arguments 
+						$a7441949$
+					:i if  (call $8b482830$ arguments 
+							$5799172a$) 
+						:i $0ec6e82d$%s(76,"vehicle_onground_loop - QuicklyStopping, then starting ShoppingCartLoopSound")
+						:i $77b88a5b$.call $d632414e$ arguments 
+							$a7441949$
+						:i $77b88a5b$.call $180ea2af$ arguments 
+							$a7441949$
+						:i call $da5b56f5$ arguments 
+							$a7441949$$1468a3f6$ = %i(0,00000000)$264160d8$ = %i(0,00000000)
+					:i endif
+				:i endif
+			:i else 
+				:i if  (call $8b482830$ arguments 
+						$5799172a$) 
+					:i if call $d681fc05$ arguments 
+							$a7441949$
+						:i $77b88a5b$.call $d632414e$ arguments 
+							$a7441949$
+					:i endif
+				:i endif
+			:i endif
+		:i endif
+		:i $436456d2$
+		:i %GLOBAL%$3004bfa9$
+		:i $1a7c1182$%i(1,00000001)$05df37fc$
+	:i loop_to 
+:i endfunction
+:i function $e6282e10$
+	:i $36c11136$
+	:i if call $7b7166cf$ arguments 
+			$36fb0796$
+		:i $77b88a5b$.$d632414e$%GLOBAL%$36fb0796$
+	:i endif
+	:i while
+		
+		:i if  (%GLOBAL%$54ec5530$ = $46d6d2d8$) 
+			:i if $57b9aa26$%i(0,00000000)
+				:i if NOT call $d681fc05$ arguments 
+						$a7441949$
+					:i if  (call $8b482830$ arguments 
+							$5799172a$) 
+						:i $0ec6e82d$%s(88,"vehicle_accel_ground_sound_loop - Quickly Stopping, then starting ShoppingCartLoop sound")
+						:i $77b88a5b$.call $d632414e$ arguments 
+							$a7441949$
+						:i $77b88a5b$.call $180ea2af$ arguments 
+							$a7441949$
+						:i call $da5b56f5$ arguments 
+							$a7441949$$1468a3f6$ = %i(0,00000000)$264160d8$ = %i(0,00000000)
+					:i endif
+				:i endif
+			:i else 
+				:i if call $d681fc05$ arguments 
+						$a7441949$
+					:i $77b88a5b$.call $d632414e$ arguments 
+						$a7441949$
+				:i endif
+			:i endif
+		:i endif
+		:i $1a7c1182$%i(1,00000001)$05df37fc$
+	:i loop_to %i(2,00000002)
+:i endfunction
+:i function $436456d2$
+	:i if $2c717a0c$
+		:i $aa1b0165$
+	:i endif
+	:i if $cf5cee79$
+		:i $44a6f3e0$
+	:i endif
+:i endfunction
+:i function $79c12056$
+	:i $36c11136$
+	:i if call $2e77a2ed$ arguments 
+			$97189885$
+		:i call $91721e0b$ arguments 
+			$a49b5498$ = $e18cd22c$$09fe09fe$
+	:i else 
+		:i if call $2e77a2ed$ arguments 
+				$eb8a354b$
+			:i call $91721e0b$ arguments 
+				$a49b5498$ = $7614faf2$$09fe09fe$
+		:i else 
+			:i if $d599cc76$
+				:i call $91721e0b$ arguments 
+					$a49b5498$ = select(2f,9, 01 00 01 00 01 00 01 00 01 00 01 00 01 00 01 00 01 00) :OFFSET(0):OFFSET(1):OFFSET(2):OFFSET(3):OFFSET(4):OFFSET(5):OFFSET(6):OFFSET(7):OFFSET(8)
+						 :POS(0) $c8fd57aa$
+					:BREAKTO(9)
+						 :POS(1) $c8fd57aa$
+					:BREAKTO(9)
+						 :POS(2) $c8fd57aa$
+					:BREAKTO(9)
+						 :POS(3) $c8fd57aa$
+					:BREAKTO(9)
+						 :POS(4) $c8fd57aa$
+					:BREAKTO(9)
+						 :POS(5) $c8fd57aa$
+					:BREAKTO(9)
+						 :POS(6) $c8fd57aa$
+					:BREAKTO(9)
+						 :POS(7) $2a097ce5$
+					:BREAKTO(9)
+						 :POS(8) $cba185fe$ :POS(9) 
+				:i endif
+			:i endif
+		:i endif
+	:i endfunction
+	:i function call $1ffb86eb$ arguments 
+			$94886e4f$ = %i(0,00000000)$ac16e59a$ = %i(0,00000000)$7bc8511c$ = %i(0,00000000)
+		:i $36c11136$
+		:i if call $7b7166cf$ arguments 
+				$771a573a$
+			:i call $9fb2d4f1$ arguments 
+				$626f784d$ = %f(1.000000)$597623bf$ = %f(0.100000)
+			:i call $9fb2d4f1$ arguments 
+				$35cffc5c$ = $96eee049$$626f784d$ = %f(0.000000)$597623bf$ = %f(0.100000)
+		:i endif
+		:i if $98852378$
+			:i if $2a6cdc4a$
+				:i call $61449f40$ arguments 
+					$9f4f1f91$ = %GLOBAL%$603c6b3e$$d19e902a$ = %GLOBAL%$d00f648b$$ef855445$ = $97189885$
+			:i else 
+				:i call $61449f40$ arguments 
+					$9f4f1f91$ = %GLOBAL%$c27a12df$$d19e902a$ = %GLOBAL%$6be2d3bf$$ef855445$ = $97189885$
+			:i endif
+		:i else 
+			:i if $9d4a601d$
+				:i if $2a6cdc4a$
+					:i call $61449f40$ arguments 
+						$9f4f1f91$ = %GLOBAL%$678f8791$$d19e902a$ = %GLOBAL%$902fe64c$$ef855445$ = $eb8a354b$
+				:i else 
+					:i call $61449f40$ arguments 
+						$9f4f1f91$ = %GLOBAL%$e534bea9$$d19e902a$ = %GLOBAL%$79f26110$$ef855445$ = $eb8a354b$
+				:i endif
+			:i else 
+				:i if $05bd8b1f$
+					:i $4aaccac0$
+					:i if  (%GLOBAL%$0901d9f0$ > %i(50,00000032)) 
+						:i call $91721e0b$ arguments 
+							$a49b5498$ = %GLOBAL%$196d5726$$09fe09fe$
+					:i else 
+						:i if call $9c466623$ arguments 
+								$c253f9c5$ = $c46f00e3$%i(2,00000002)$96eee049$
+							:i call $7fa39fad$ arguments 
+								$7f98759b$
+						:i else 
+							:i call $91721e0b$ arguments 
+								$a49b5498$ = %GLOBAL%$ca291455$$6c2e794f$$09fe09fe$
+						:i endif
+					:i endif
+				:i else 
+					:i if $2a6cdc4a$
+						:i if $098546dd$%i(300,0000012c)
+							:i call $f47e74c8$ arguments 
+								$e6282e10$
+							:i call $91721e0b$ arguments 
+								$a49b5498$ = %GLOBAL%$c0adce43$$09fe09fe$
+							:i $59a928b6$
+						:i else 
+							:i call $91721e0b$ arguments 
+								$a49b5498$ = %GLOBAL%$1c02cd6a$$6c2e794f$$09fe09fe$
+						:i endif
+					:i else 
+						:i if call $7b7166cf$ arguments 
+								$e7fb9f31$
+							:i $4aaccac0$
+							:i if  (%GLOBAL%$0901d9f0$ > %i(50,00000032)) 
+								:i call $91721e0b$ arguments 
+									$a49b5498$ = %GLOBAL%$1c02cd6a$$6c2e794f$$09fe09fe$$0901d9f0$ = %f(0.700000)
+							:i else 
+								:i call $91721e0b$ arguments 
+									$a49b5498$ = %GLOBAL%$ca291455$$6c2e794f$$09fe09fe$
+							:i endif
+						:i else 
+							:i call $91721e0b$ arguments 
+								$a49b5498$ = %GLOBAL%$ca291455$$6c2e794f$$09fe09fe$
+						:i endif
+					:i endif
+				:i endif
+			:i endif
+		:i endif
+	:i endfunction
+	:i function $61449f40$
+		:i $36c11136$
+		:i if call $7b7166cf$ arguments 
+				$771a573a$
+			:i $9c0559fa$ isNull 
+			:i return
+			
+		:i endif
+		:i if NOT $46960f1a$%GLOBAL%$9f4f1f91$
+			:i if NOT $46960f1a$%GLOBAL%$d19e902a$
+				:i if  (%GLOBAL%$d19e902a$ = %GLOBAL%$9f4f1f91$) 
+					:i call $91721e0b$ arguments 
+						$a49b5498$ = %GLOBAL%$9f4f1f91$$6c2e794f$$09fe09fe$
+				:i else 
+					:i call $91721e0b$ arguments 
+						$a49b5498$ = %GLOBAL%$d19e902a$$09fe09fe$
+				:i endif
+			:i endif
+			:i if $d599cc76$
+				:i call $91721e0b$ arguments 
+					$a49b5498$ = %GLOBAL%$9f4f1f91$$6c2e794f$$09fe09fe$
+			:i endif
+		:i endif
+	:i endfunction
+	:i function $9c0559fa$
+		:i $36c11136$
+		:i if NOT call $d52a8ed5$ arguments 
+				$35cffc5c$ = $96eee049$
+			:i call $ae44bbca$ arguments 
+				$35cffc5c$ = $96eee049$
+			:i call $9fb2d4f1$ arguments 
+				$35cffc5c$ = $96eee049$$626f784d$ = %f(0.000000)
+		:i endif
+		:i $9a0f6622$ = %GLOBAL%$1c02cd6a$
+		:i call $91721e0b$ arguments 
+			$a49b5498$ = %GLOBAL%$9a0f6622$$6c2e794f$$ae719309$
+		:i call $91721e0b$ arguments 
+			$35cffc5c$ = $96eee049$$a49b5498$ = %GLOBAL%$d19e902a$$6c2e794f$$ae719309$
+		:i call $9fb2d4f1$ arguments 
+			$626f784d$ = %f(0.200000)$597623bf$ = %f(1.000000)
+		:i call $9fb2d4f1$ arguments 
+			$35cffc5c$ = $96eee049$$626f784d$ = %f(0.800000)$597623bf$ = %f(1.000000)
+		:i $1a7c1182$%i(1,00000001)$05df37fc$
+		:i if  (%GLOBAL%$ef855445$ = $eb8a354b$) 
+			:i $15ea2931$ = $688b6b78$
+			:i $c3643a26$ = $c55009a5$
+		:i else 
+			:i $15ea2931$ = $fa7e84d8$
+			:i $c3643a26$ = $951a23b7$
+		:i endif
+		:i while
+			
+			:i if $2e77a2ed$%GLOBAL%$ef855445$
+			:i else 
+				:i if $2e77a2ed$%GLOBAL%$15ea2931$
+				:i else 
+					:i if $2e77a2ed$%GLOBAL%$c3643a26$
+					:i else 
+						:i continue
+						
+					:i endif
+				:i endif
+			:i endif
+			:i $1a7c1182$%i(1,00000001)$05df37fc$
+		:i loop_to 
+		:i $993d6649$ = %f(0.100000)
+		:i call $9fb2d4f1$ arguments 
+			$626f784d$ = %f(1.000000)$597623bf$ = %GLOBAL%$993d6649$
+		:i call $9fb2d4f1$ arguments 
+			$35cffc5c$ = $96eee049$$626f784d$ = %f(0.000000)$597623bf$ = %GLOBAL%$993d6649$
+		:i $1a7c1182$%GLOBAL%call $993d6649$ arguments 
+			$19f629d0$
+		:i call $7fa39fad$ arguments 
+			$49b337d1$
+	:i endfunction
+	:i function $287884f4$
+		:i if call $d52a8ed5$ arguments 
+				$35cffc5c$ = $96eee049$
+			:i call $3e49c2af$ arguments 
+				$35cffc5c$ = $96eee049$
+		:i endif
+	:i endfunction
+	:i function $e888e7bd$
+		:i $36c11136$
+		:i call $66a4fabe$ arguments 
+			$120781c2$
+		:i $12379292$ = %i(4294967197,ffffff9d)
+		:i while
+			
+			:i if NOT $e0cf68e1$
+				:i continue
+				
+			:i endif
+			:i if NOT call $d52a8ed5$ arguments 
+					$35cffc5c$ = $7e55f8b3$
+				:i $a3a161be$
+				:i $1a7c1182$%i(1,00000001)$05df37fc$
+			:i else 
+				:i $4aaccac0$
+				:i $2abb5c1f$ = %i(0,00000000)
+				:i if  (%GLOBAL%$0901d9f0$ > %i(0,00000000)) 
+					:i $2abb5c1f$ = %i(1,00000001)
+				:i endif
+				:i if NOT $f287a25e$
+					:i $2abb5c1f$ = %i(0,00000000)
+				:i endif
+				:i if  (%GLOBAL%$2abb5c1f$ = %i(1,00000001)) 
+					:i if  (%GLOBAL%$0901d9f0$ > %i(50,00000032)) 
+						:i $8bb26477$ = %i(1,00000001)
+					:i else 
+						:i $8bb26477$ =  (%GLOBAL%$0901d9f0$ / %i(50,00000032)) 
+					:i endif
+					:i if NOT  (%GLOBAL%$8bb26477$ = %GLOBAL%$12379292$) 
+						:i call $91721e0b$ arguments 
+							$35cffc5c$ = $7e55f8b3$$a49b5498$ = %GLOBAL%$35cb442d$$0901d9f0$ = %GLOBAL%$8bb26477$$6c2e794f$
+						:i $12379292$ = %GLOBAL%$8bb26477$
+					:i endif
+				:i else 
+					:i if NOT  (%GLOBAL%$12379292$ = %i(0,00000000)) 
+						:i call $91721e0b$ arguments 
+							$35cffc5c$ = $7e55f8b3$$a49b5498$ = %GLOBAL%$35cb442d$$0901d9f0$ = %i(0,00000000)$8f5ee546$ = $f4cb0c23$
+						:i $12379292$ = %i(0,00000000)
+					:i endif
+				:i endif
+				:i $1a7c1182$%i(10,0000000a)$05df37fc$
+			:i endif
+		:i loop_to 
+	:i endfunction
+	:i function $a3a161be$
+		:i call $ae44bbca$ arguments 
+			$35cffc5c$ = $7e55f8b3$$966c833d$ = %i(1,00000001)
+		:i call $9fb2d4f1$ arguments 
+			$35cffc5c$ = $7e55f8b3$$626f784d$ = %i(1,00000001)
+		:i if $34b2ce6e$
+			:i call $2280a927$ arguments 
+				$35cffc5c$ = $7e55f8b3$
+		:i endif
+	:i endfunction
+	:i function $120781c2$
+		:i if call $d52a8ed5$ arguments 
+				$35cffc5c$ = $7e55f8b3$
+			:i call $3e49c2af$ arguments 
+				$35cffc5c$ = $7e55f8b3$
+		:i endif
+	:i endfunction
+	:i function $bfcde9da$
+		:i $36c11136$
+		:i if call $2e77a2ed$ arguments 
+				$97189885$
+			:i $3b980f51$%GLOBAL%$bfcf8a85$
+			:i call $91721e0b$ arguments 
+				$a49b5498$ = %GLOBAL%$6be2d3bf$$09fe09fe$
+		:i else 
+			:i if call $2e77a2ed$ arguments 
+					$eb8a354b$
+				:i $3b980f51$%GLOBAL%$bfcf8a85$
+				:i call $91721e0b$ arguments 
+					$a49b5498$ = %GLOBAL%$79f26110$$09fe09fe$
+			:i else 
+				:i if call $2e77a2ed$ arguments 
+						$c46f00e3$
+					:i if call $7b7166cf$ arguments 
+							$196d5726$
+						:i call $91721e0b$ arguments 
+							$a49b5498$ = %GLOBAL%$196d5726$$09fe09fe$
+					:i endif
+				:i else 
+					:i call $91721e0b$ arguments 
+						$a49b5498$ = %GLOBAL%$ca291455$$6c2e794f$$09fe09fe$
+					:i $3b980f51$%i(0,00000000)
+					:i $4aaccac0$
+					:i if  (%GLOBAL%$0901d9f0$ < %GLOBAL%$4912cde9$) 
+						:i $0901d9f0$ =  (%GLOBAL%$0901d9f0$ + %GLOBAL%$844a8985$) 
+					:i endif
+					:i $9b933b38$%GLOBAL%$0901d9f0$
+				:i endif
+			:i endif
+		:i endif
+	:i endfunction
+	:i function $7f98759b$
+		:i $36c11136$
+		:i $82809286$
+		:i call $7b9e0c2c$ arguments 
+			$dcab5faa$
+		:i $3b980f51$%i(100,00000064)
+		:i call $2d5730cb$ arguments 
+			$5ff7f50e$
+		:i call $91721e0b$ arguments 
+			$a49b5498$ = %GLOBAL%$ca291455$$09fe09fe$$6c2e794f$
+		:i while
+			
+			:i $1a7c1182$%i(1,00000001)$05df37fc$
+			:i if call $2e77a2ed$ arguments 
+					$8f116bbc$
+				:i continue
+				
+			:i endif
+			:i if $2a6cdc4a$
+				:i continue
+				
+			:i endif
+		:i loop_to 
+		:i call $3b980f51$ arguments 
+			$20ffa11c$
+		:i call $7fa39fad$ arguments 
+			$49b337d1$
+	:i endfunction
+	:i function $4c3a7624$
+		:i $0ec6e82d$%s(43,"restoring original bounding sphere for bail")
+		:i $8fda415b$
+	:i endfunction
+	:i function $bd702784$
+		:i $36c11136$
+		:i if call $7b7166cf$ arguments 
+				$99cacac8$
+			:i call $96bf8e94$ arguments 
+				$977c0058$
+			:i $425cca11$
+			:i $64783d8c$
+			:i if $30368e44$
+				:i $9b933b38$%i(0,00000000)
+			:i endif
+			:i call $7fa39fad$ arguments 
+				$6688b083$
+		:i endif
+		:i $15b32f45$%i(10000,00002710)
+		:i call $66a4fabe$ arguments 
+			$4c3a7624$
+		:i if call $7b7166cf$ arguments 
+				$771a573a$
+			:i call $9fb2d4f1$ arguments 
+				$626f784d$ = %f(1.000000)
+			:i call $9fb2d4f1$ arguments 
+				$35cffc5c$ = $96eee049$$626f784d$ = %f(0.000000)
+		:i endif
+		:i call $0a3cc6f6$ arguments 
+			$d6a82173$ = %s(4,"bail")
+		:i $e0aac56f$
+		:i call $19f22c40$ arguments 
+			$042d6c5c$ = $cf3269cc$
+		:i $77b88a5b$.$d632414e$%GLOBAL%$7b3c7107$
+		:i $77b88a5b$.$5f93e3ed$
+		:i $881cda10$
+		:i $203bc354$
+		:i call $fdf5246e$ arguments 
+			$578a146f$
+		:i $591a68ec$
+		:i call $71dc2776$ arguments 
+			$710d5972$
+		:i $d9e20ee0$
+		:i $b8a553e5$
+		:i if NOT $40e07cf3$
+			:i $3b980f51$%i(20,00000014)
+			:i if  (%GLOBAL%$363ef084$ = %i(0,00000000)) 
+				:i call $e9f94c58$ arguments 
+					$c77f6bec$
+			:i endif
+		:i else 
+			:i $3b980f51$%i(1000,000003e8)
+		:i endif
+		:i $91e219bc$
+		:i call $d5d8f190$ arguments 
+			$76dd8962$ = %i(10000,00002710)$f4e7f3ed$ = %i(0,00000000)$ba676b90$ = %i(0,00000000)
+		:i $ebdfcf9f$
+		:i $a4350036$
+		:i if call $7b7166cf$ arguments 
+				$624bf37a$
+		:i endif
+		:i $36c11136$
+		:i if call $7b7166cf$ arguments 
+				$99c5b9c2$
+			:i $77b88a5b$.$180ea2af$%GLOBAL%call $99c5b9c2$ arguments 
+				$1468a3f6$ = %i(200,000000c8)$264160d8$ = select(2f,3, 01 00 01 00 01 00) :OFFSET(10):OFFSET(11):OFFSET(12)
+					 :POS(10) %i(90,0000005a)
+				:BREAKTO(13)
+					 :POS(11) %i(100,00000064)
+				:BREAKTO(13)
+					 :POS(12) %i(110,0000006e) :POS(13) 
+			:i endif
+			:i if $621e85e9$
+				:i call $c2e5a423$ arguments 
+					$59dc16e2$$0cf13170$ = :s{$884b053e$ = %GLOBAL%$884b053e$$f085ab47$ = %GLOBAL%$f085ab47$:s}
+				:i call $e9d26600$ arguments 
+					$b601103b$
+				:i call $0a5f8adf$ arguments 
+					$31c14f11$ = %i(1,00000001)$c67f499e$ = %i(100,00000064)$3f7fa079$ = %f(0.200000)
+				:i call $96bf8e94$ arguments 
+					$04479f43$
+				:i call $87c8c110$ arguments 
+					$ead92404$ = %f(2.000000)
+				:i call $f3ad76c8$ arguments 
+					$ead92404$ = Unknown instruction at 00001689:30
+
+#/ END

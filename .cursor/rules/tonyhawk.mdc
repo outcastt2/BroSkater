@@ -1,0 +1,75 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 🛹 PROJECT OVERVIEW
+# This project aims to recreate the core physics and gameplay systems of Tony Hawk’s Underground 2 in Unity.
+# The original source code of THUG1 (found at https://github.com/RetailGameSourceCode/TonyHawksUnderground)
+# serves as the primary reference. We treat the repo as canonical unless explicitly overridden.
+
+# This is NOT a 1:1 emulator; we will refactor legacy systems where modern Unity architecture requires.
+
+rules:
+  - name: Original Source Canon
+    description: |
+      When in doubt, refer to the original THUG1 source code as the authoritative implementation.
+      Treat systems such as CRailNode, CRailManager, CSkaterCorePhysicsComponent, and related game logic as truth.
+      Assume THUG2 iterates directly on top of THUG1 unless evidence suggests otherwise.
+
+  - name: Decompose and Port, Not Copy-Paste
+    description: |
+      Avoid direct 1:1 translation of C++ source to Unity C#. Instead, decompose each gameplay system (e.g., grinding, air control, vert transfer)
+      into clearly scoped Unity components, prioritizing readability, modularity, and ECS compatibility where possible.
+
+  - name: Preserve Feel, Not Flaws
+    description: |
+      Preserve the *feel* of THUG2 gameplay (momentum arcs, grind auto-snapping, input forgiveness).
+      Do NOT replicate janky legacy bugs unless they are core to the gameplay or animation (e.g., wallplant edge cases).
+      Use Unity’s physics only where precision permits — avoid Rigidbody unless necessary.
+
+  - name: Grind Path System
+    description: |
+      Rails must be decomposed into a chain of discrete grind nodes, following the logic of CRailNode and CRailManager.
+      Each frame during a grind, project the skater onto the current segment, clamp to segment bounds, and transition between segments when needed.
+      Eject from grind state only when reaching end of chain, never via simple clamping overflow.
+
+  - name: Simulation First, Animation Second
+    description: |
+      Input should always update player state machines and simulate physical position first.
+      Animation rigs should follow the simulated state. Never drive simulation from animation.
+      Example: Player rotation during manuals is based on tilt angle from physics, not animation events.
+
+  - name: Unity Project Structure
+    description: |
+      Namespace all THUG-inspired systems under `BroSkater.<System>`.
+      Examples: `BroSkater.Player.Controller`, `BroSkater.Rails.GrindManager`, `BroSkater.Input.TrickBuffer`.
+      Place all raw unpacked THUG scripts, offsets, and research materials in `/Reference/THUG1_Source`.
+
+  - name: Cross-reference Cursor Threads
+    description: |
+      When tackling any new system (e.g., lip tricks, spine transfers), open a new thread and label it with a tag like [THUG2::AirPhysics] or [THUG1::RailLogic].
+      Link back to relevant THUG1 GitHub paths and quote C++ function names like `CCompositeObject::GetDisplayMatrix()`.
+
+  - name: Fidelity vs Fun Flag
+    description: |
+      When an implementation choice arises between "pure authenticity" and "modern sensibility," tag that decision point with a `// [FidelityVsFun]` comment.
+      Use these to mark places where we intentionally deviate from THUG2 behavior for quality-of-life or modern gameplay polish.
+
+  - name: Vertical Slice First
+    description: |
+      The first milestone is a vertical slice demonstrating the foundational player systems in a greybox environment.
+      This includes:
+        • THPS3-style ground movement & skater rotation
+        • Ollie + double ollie timing
+        • Rail detection, snap, grind traversal, and exit
+        • Vert ramp detection and correct airtime projection
+        • Spine transfer detection and animation-cancel logic
+        • Full bail system on failed landings or mistimed grinds
+      Do not implement trick scoring, special meter, or animation blending until these movement primitives are locked in.
+
+  - name: Everything Is Replaceable
+    description: |
+      No file, no function, no component is sacred. Everything may be thrown away if it gets in the way of a better implementation.
+
+      Comment with `// [LEGACY]` to mark systems that are temporary stubs or THUG-derived placeholders.

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8604d3c8f11180347965944107e7b975, type: 3}
+  m_Name: DefaultSkaterPhysics
+  m_EditorClassIdentifier: 
+  ollieVerticalForce: {x: 20, y: 20}
+  ollieForwardBoost: {x: 1, y: 3}
+  vertJumpForce: {x: 95, y: 16}
+  grindExitJumpForce: {x: 51, y: 112.6}
+  jumpChargeBoost: {x: 15, y: 25}
+  minGrindSpeed: 5
+  grindEntrySpeedBoostMultiplier: 1.2
+  grindLeanGravity: {x: 0.5, y: 0.2}
+  grindLeanAcc: {x: 3, y: 1}
+  grindInstabilityRate: {x: 0.1, y: 0.05}
+  grindLeanBailAngle: {x: 4000, y: 4000}
+  grindWobbleBaseMagnitude: {x: 1, y: 1}
+  grindWobbleIncreaseRate: {x: 1, y: 1}
+  grindWobbleMaxMagnitude: 100
+  maxPushSpeed: {x: 15, y: 15}
+  coastSpeedMultiplier: 12.4
+  acceleration: {x: 10, y: 20}
+  brakeForce: 28
+  coastDeceleration: 0
+  maxJumpChargeSpeed: {x: 25, y: 25}
+  vertPushOutDistance: 5
+  vertAlignSpeed: 10
+  vertColor: {r: 0, g: 1, b: 0, a: 1}
+  grindColor: {r: 1, g: 1, b: 1, a: 1}
+  standardSwitchMultiplier: 0.8

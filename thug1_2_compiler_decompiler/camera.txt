@@ -1,0 +1,53 @@
+#/ QB Script version 2.1 by RoQ www.HackTHPS.de
+%include "camera.qb_table.qbi"   #/ Table file
+
+:i $camera_fov$ = %f(72.000000)
+:i $widescreen_camera_fov$ = %f(88.180000)
+:i $compact_camera_fov$ = %f(80.000000)
+:i $current_screen_mode$ = $standard_screen_mode$
+:i function $screen_setup_standard$
+	:i call $SetScreen$ arguments 
+		$Aspect$ = %f(1.333333)$Angle$ = $camera_fov$$letterbox$ = %i(0,00000000)
+	:i if call $GotParam$ arguments 
+			$set_screen_flags$
+		:i call $UnSetGlobalFlag$ arguments 
+			$flag$ = $SCREEN_MODE_WIDE$
+		:i call $SetGlobalFlag$ arguments 
+			$flag$ = $SCREEN_MODE_STANDARD$
+	:i endif
+	:i call $change$ arguments 
+		$current_screen_mode$ = $standard_screen_mode$
+	:i $printf$%s(18,"change to standard")
+:i endfunction
+:i function $screen_setup_widescreen$
+	:i call $SetScreen$ arguments 
+		$Aspect$ = %f(1.777778)$Angle$ = $widescreen_camera_fov$$letterbox$ = %i(0,00000000)
+	:i if call $GotParam$ arguments 
+			$set_screen_flags$
+		:i call $UnSetGlobalFlag$ arguments 
+			$flag$ = $SCREEN_MODE_STANDARD$
+		:i call $SetGlobalFlag$ arguments 
+			$flag$ = $SCREEN_MODE_WIDE$
+	:i endif
+	:i call $change$ arguments 
+		$current_screen_mode$ = $widescreen_screen_mode$
+	:i $printf$%s(20,"change to widescreen")
+:i endfunction
+:i function $screen_setup_letterbox$
+	:i call $SetScreen$ arguments 
+		$Aspect$ = %f(1.777778)$Angle$ = $widescreen_camera_fov$$letterbox$ = %i(1,00000001)
+	:i if call $GotParam$ arguments 
+			$set_screen_flags$
+		:i call $SetGlobalFlag$ arguments 
+			$flag$ = $SCREEN_MODE_STANDARD$
+		:i call $SetGlobalFlag$ arguments 
+			$flag$ = $SCREEN_MODE_WIDE$
+	:i endif
+	:i call $change$ arguments 
+		$current_screen_mode$ = $letterbox_screen_mode$
+	:i $printf$%s(19,"change to letterbox")
+:i endfunction
+:i :end
+
+
+#/ END

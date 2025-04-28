@@ -1,0 +1,87 @@
+#/ QB Script version 2.1 by RoQ www.HackTHPS.de
+%include "game.qb_table.qbi"   #/ Table file
+
+:i function $PauseMusicAndStreams$
+	:i $PauseMusic$%i(1,00000001)
+	:i $PauseStream$%i(1,00000001)
+:i endfunction
+:i function $UnPauseMusicAndStreams$
+	:i $PauseMusic$%i(0,00000000)
+	:i $PauseStream$%i(0,00000000)
+:i endfunction
+:i function $do_backend_retry$
+	:i if NOT $IsObserving$
+		:i $Skater$.$KillSpecial$
+	:i endif
+	:i $GoalManager_UninitializeAllGoals$
+	:i if $InNetGame$
+		:i if NOT $IsObserving$
+			:i $ExitSurveyorMode$
+			:i $Skater$.$add_skater_to_world$
+		:i endif
+		:i $ResetProSetFlags$
+		:i if NOT $IsObserving$
+			:i $Skater$.$RunStarted$
+		:i endif
+		:i $ClearPowerups$
+	:i endif
+	:i call $SpawnScript$ arguments 
+		$do_screen_freeze$
+:i endfunction
+:i function $do_screen_freeze$
+	:i $kill_net_panel_messages$
+	:i $PauseGame$
+	:i if $InNetGame$
+		:i call $exit_pause_menu$ arguments 
+			$menu_id$ = $pause_menu$
+		:i $force_close_rankings$
+		:i $destroy_onscreen_keyboard$
+		:i $StartNetworkLobby$
+	:i else 
+		:i call $exit_pause_menu$ arguments 
+			$menu_id$ = $pause_menu$
+		:i $force_close_rankings$
+		:i call $SetGameType$ arguments 
+			$freeskate2p$
+		:i $SetCurrentGameType$
+	:i endif
+	:i $Wait$%i(2,00000002)$gameframe$
+	:i $unpausegame$
+	:i $retry$
+:i endfunction
+:i function $entered_chat_message$
+	:i call $GetTextElementString$ arguments 
+		$id$ = $keyboard_current_string$
+	:i call $SendChatMessage$ arguments 
+		$string$ = %GLOBAL%$string$
+	:i $destroy_onscreen_keyboard$
+:i endfunction
+:i function $menu_entered_chat_message$
+	:i $entered_chat_message$
+	:i $create_pause_menu$
+:i endfunction
+:i function $cancel_chat_menu$
+	:i $destroy_onscreen_keyboard$
+	:i $create_pause_menu$
+:i endfunction
+:i function $launch_chat_keyboard$
+	:i $hide_current_goal$
+	:i call $DestroyScreenElement$ arguments 
+		$id$ = $current_menu_anchor$
+	:i call $create_onscreen_keyboard$ arguments 
+		$allow_cancel$$icon$ = %GLOBAL%$icon$$keyboard_cancel_script$ = $cancel_chat_menu$$keyboard_done_script$ = $menu_entered_chat_message$$keyboard_title$ = %s(13,"ENTER MESSAGE")$min_length$ = %i(0,00000000)$max_length$ = %i(127,0000007f)$text$ = %s(0,"")
+:i endfunction
+:i function $enter_kb_chat$
+	:i call $create_onscreen_keyboard$ arguments 
+		$allow_cancel$$no_buttons$$pos$ = %vec2(320.000000,260.000000)$keyboard_done_script$ = $entered_chat_message$$display_text$ = %s(15,"ENTER MESSAGE: ")$keyboard_title$ = %s(13,"ENTER MESSAGE")$min_length$ = %i(1,00000001)$max_length$ = %i(127,0000007f)$display_text_scale$ = %f(0.500000)
+:i endfunction
+:i function $PreRunQueuedScripts$
+	:i $SetSlomo$%f(100.000000)
+:i endfunction
+:i function $PostRunQueuedScripts$
+	:i $SetSlomo$%i(1,00000001)
+:i endfunction
+:i :end
+
+
+#/ END

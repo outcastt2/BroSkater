@@ -1,0 +1,50 @@
+#/ QB Script version 2.1 by RoQ www.HackTHPS.de
+%include "rail_editor.qb_table.qbi"   #/ Table file
+
+:i function $CreateRailEditor$
+	:i $CreateCompositeObject$:s{
+		:i $Components$ = 
+		:i :a{
+			:i :s{$component$ = $camera$:s}
+			:i :s{$component$ = call $input$ arguments 
+					$controller$ = %i(0,00000000):s}
+			:i :s{$component$ = call $editorcamera$ arguments 
+					$min_height$ = %i(20,00000014)$min_radius$ = %i(10,0000000a)$max_radius$ = %i(1000,000003e8)$SimpleCollision$:s}
+			:i :s{$component$ = $raileditor$:s}
+			:i :a}
+		:i $Params$ = :s{$Name$ = call $raileditor$ arguments 
+				$permanent$:s}
+	:i :s}
+	:i $raileditor$.$Hide$
+	:i $raileditor$.$Suspend$
+:i endfunction
+:i function $SwitchOnRailEditor$
+	:i $raileditor$.call $SetEditingMode$ arguments 
+		$Mode$ = $FreeRoaming$
+	:i call $Debounce$ arguments 
+		$X$$time$ = %f(0.200000)$clear$ = %i(1,00000001)
+	:i $raileditor$.$Unsuspend$
+	:i $raileditor$.$Unhide$
+	:i $GetParkEditorCursorPos$
+	:i $raileditor$.call $EditorCam_Initialise$ arguments 
+		$position$ = %GLOBAL%$pos$$cursor_height$ = %i(20,00000014)
+	:i call $SetActiveCamera$ arguments 
+		$id$ = $raileditor$
+:i endfunction
+:i function $SwitchOffRailEditor$
+	:i if $raileditor$.call $GetEditedRailInfo$ arguments 
+			$CurrentRail$
+		:i if  (%GLOBAL%$num_points$ < %i(2,00000002)) 
+			:i $raileditor$.call $DeleteRail$ arguments 
+				$rail_id$ = %GLOBAL%$rail_id$
+		:i endif
+	:i endif
+	:i $raileditor$.$Hide$
+	:i $raileditor$.$Suspend$
+	:i call $SetActiveCamera$ arguments 
+		$id$ = $parked_cam$
+:i endfunction
+:i :end
+
+
+#/ END
